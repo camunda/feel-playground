@@ -16,7 +16,9 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "npm run typecheck && vite build --config vite.lib.config.ts && vite build",
+    "build": "npm run build:lib && vite build",
+    "build:lib": "npm run typecheck && vite build --config vite.lib.config.ts",
+    "prepare": "npm run build:lib",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
