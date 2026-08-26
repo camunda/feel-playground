@@ -17,7 +17,10 @@ export function ContextEditor({ value, onChange, error }: ContextEditorProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
   const valueRef = useRef(value);
+  const onChangeRef = useRef(onChange);
   const attributesRef = useRef(new Compartment());
+
+  onChangeRef.current = onChange;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -48,7 +51,7 @@ export function ContextEditor({ value, onChange, error }: ContextEditorProps) {
 
             const nextValue = update.state.doc.toString();
             valueRef.current = nextValue;
-            onChange(nextValue);
+            onChangeRef.current(nextValue);
           })
         ]
       })
@@ -60,7 +63,7 @@ export function ContextEditor({ value, onChange, error }: ContextEditorProps) {
       editorRef.current = null;
       editor.destroy();
     };
-  }, [onChange]);
+  }, []);
 
   useEffect(() => {
     const editor = editorRef.current;
