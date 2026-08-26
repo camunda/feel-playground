@@ -42,7 +42,11 @@ function Result({ state }: ResultViewProps) {
     case 'unavailable':
       return <p className="feel-playground__message is-warning">{state.message}</p>;
     case 'error':
-      return <p className="feel-playground__message is-error">{state.error}</p>;
+      return (
+        <div className="feel-playground__errors">
+          <p>{state.error}</p>
+        </div>
+      );
     case 'success':
     case 'warning':
       return <pre>{formatResult(state.result)}</pre>;
