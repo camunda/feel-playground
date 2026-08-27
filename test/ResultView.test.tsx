@@ -62,7 +62,7 @@ describe('<ResultView>', () => {
     renderResult({ status: 'scheduled' });
 
     // then
-    expect(screen.getByText('Waiting for input to settle…')).toBeTruthy();
+    expect(screen.getByText('Evaluating on the configured cluster…')).toBeTruthy();
   });
 
 
@@ -72,7 +72,7 @@ describe('<ResultView>', () => {
 
     // then
     expect(screen.getByText('Evaluating on the configured cluster…')).toBeTruthy();
-    expect(screen.getByText('loading')).toBeTruthy();
+    expect(screen.queryByText('loading')).toBeNull();
   });
 
 

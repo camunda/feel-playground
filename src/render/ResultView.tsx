@@ -39,17 +39,12 @@ function Result({ state }: ResultViewProps) {
     case 'invalid-context':
       return <p>Enter a valid FEEL expression and context to evaluate.</p>;
     case 'scheduled':
-      return <p>Waiting for input to settle…</p>;
     case 'loading':
       return <p>Evaluating on the configured cluster…</p>;
     case 'unavailable':
-      return <p className="feel-playground__message is-warning">{state.message}</p>;
+      return <p>{state.message}</p>;
     case 'error':
-      return (
-        <div className="feel-playground__errors">
-          <p>{state.error}</p>
-        </div>
-      );
+      return <p>{state.error}</p>;
     case 'success':
     case 'warning':
       return <pre>{formatResult(state.result)}</pre>;
@@ -63,9 +58,8 @@ function Status({ status }: { status: PlaygroundState['status'] }) {
     case 'invalid-expression':
     case 'invalid-context':
     case 'scheduled':
-      return null;
     case 'loading':
-      return <span className="feel-playground__status is-loading">loading</span>;
+      return null;
     case 'unavailable':
       return <StatusIcon status="warning" />;
     case 'success':
