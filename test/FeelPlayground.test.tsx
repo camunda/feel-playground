@@ -102,6 +102,27 @@ describe('<FeelPlayground>', () => {
   });
 
 
+  it('should evaluate when the host becomes available', async () => {
+
+    // given
+    const onEvaluate = vi.fn<Evaluate>().mockResolvedValue({ result: 2 });
+    const { rerender } = render(createPlayground({
+      context: '{}',
+      evaluationUnavailable: 'No cluster connection.'
+    }));
+
+    act(() => feelEditor.onLint?.([]));
+    expect(await screen.findByText('No cluster connection.')).toBeTruthy();
+
+    // when
+    rerenderPlayground(rerender, { onEvaluate });
+
+    // then
+    await waitFor(() => expect(onEvaluate).toHaveBeenCalledOnce());
+    expect(await screen.findByText('2')).toBeTruthy();
+  });
+
+
   it('should show a context error for malformed JSON', async () => {
     // when
     renderPlayground({ context: '{' });
@@ -146,18 +167,44 @@ describe('<FeelPlayground>', () => {
 
 function renderPlayground({
   context = '{}',
+  evaluationUnavailable,
   onEvaluate = vi.fn<Evaluate>().mockResolvedValue({ result: 2 })
 }: {
   context?: string;
+  evaluationUnavailable?: string;
   onEvaluate?: Evaluate;
 } = {}) {
-  return render(
+  return render(createPlayground({ context, evaluationUnavailable, onEvaluate }));
+}
+
+function rerenderPlayground(
+  rerender: ReturnType<typeof render>['rerender'],
+  props: {
+    context?: string;
+    evaluationUnavailable?: string;
+    onEvaluate?: Evaluate;
+  }
+) {
+  rerender(createPlayground({ context: '{}', ...props }));
+}
+
+function createPlayground({
+  context,
+  evaluationUnavailable,
+  onEvaluate
+}: {
+  context: string;
+  evaluationUnavailable?: string;
+  onEvaluate?: Evaluate;
+}) {
+  return (
     <FeelPlayground
       expression="1 + 1"
       onExpressionChange={() => { }}
       context={context}
       onContextChange={() => { }}
       dialect="expression"
+      evaluationUnavailable={evaluationUnavailable}
       onEvaluate={onEvaluate}
     />
   );
