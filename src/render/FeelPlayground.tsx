@@ -10,6 +10,9 @@ import {
 import { ContextEditor } from './ContextEditor';
 import { ExpressionEditor, type FeelVariable } from './ExpressionEditor';
 import { ResultView } from './ResultView';
+import { StatusIcon } from './StatusIcon';
+
+const EVALUATION_DEBOUNCE = 300;
 
 /**
  * Controlled FEEL playground. The host owns expression and context persistence
@@ -24,7 +27,6 @@ export interface FeelPlaygroundProps {
   variables?: FeelVariable[];
   onEvaluate?: Evaluate;
   evaluationUnavailable?: string;
-  debounce?: number;
 }
 
 export function FeelPlayground({
@@ -35,14 +37,19 @@ export function FeelPlayground({
   dialect,
   variables = [],
   onEvaluate,
-  evaluationUnavailable,
-  debounce = 300
+  evaluationUnavailable
 }: FeelPlaygroundProps) {
   const controllerRef = useRef<PlaygroundController | null>(null);
   const [state, setState] = useState<PlaygroundState>({ status: 'idle' });
+  const [expressionValid, setExpressionValid] = useState<boolean | null>(null);
+
+  const handleExpressionChange = (nextExpression: string) => {
+    setExpressionValid(null);
+    onExpressionChange(nextExpression);
+  };
 
   useEffect(() => {
-    const controller = createPlaygroundController({ debounce });
+    const controller = createPlaygroundController({ debounce: EVALUATION_DEBOUNCE });
     controllerRef.current = controller;
     const unsubscribe = controller.subscribe(setState);
 
@@ -51,27 +58,30 @@ export function FeelPlayground({
       unsubscribe();
       controller.dispose();
     };
-  }, [debounce]);
+  }, []);
 
   useEffect(() => {
     controllerRef.current?.update({
       expression,
+      expressionValid,
       context,
       dialect,
       onEvaluate,
       evaluationUnavailable
     });
-  }, [expression, context, dialect, onEvaluate, evaluationUnavailable, debounce]);
+  }, [expression, expressionValid, context, dialect, onEvaluate, evaluationUnavailable]);
 
   return (
     <div className="feel-playground">
       <section className="feel-playground__section feel-playground__expression">
         <div className="feel-playground__section-heading">
           <h3>{dialect === 'unaryTests' ? 'Unary tests' : 'FEEL expression'}</h3>
+          {expressionValid === false && <StatusIcon status="error" />}
         </div>
         <ExpressionEditor
           value={expression}
-          onChange={onExpressionChange}
+          onChange={handleExpressionChange}
+          onValidityChange={setExpressionValid}
           dialect={dialect}
           variables={variables}
         />

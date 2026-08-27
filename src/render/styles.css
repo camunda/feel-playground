@@ -28,6 +28,13 @@
   text-transform: uppercase;
 }
 
+.feel-playground__status-icon {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  align-self: center;
+}
+
 .feel-playground__section-heading {
   display: flex;
   align-items: baseline;
@@ -35,11 +42,17 @@
   gap: 16px;
   padding: 0px 12px;
   background: var(--feel-playground-section-background-color, #f4f4f4);
+  border-bottom: 1px solid var(--feel-playground-border-color, #e6e7e8)
 }
 
 .feel-playground__section-heading > span:not(.feel-playground__status) {
   color: var(--feel-playground-muted-text-color, #6f6f6f);
   font-size: 12px;
+}
+
+.feel-playground__section-heading h3 {
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .feel-playground__expression-editor {
@@ -58,11 +71,11 @@
 }
 
 .feel-playground__expression-editor .cm-gutters {
-  border-right: 0;
+  width: 40px;
 }
 
-.feel-playground__expression-editor .cm-content {
-  padding-left: 4px;
+.feel-playground .cm-content {
+  padding: 6px;
 }
 
 .feel-playground__context-editor {
@@ -100,7 +113,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   min-height: 0;
   overflow: hidden;
-  border-top: 1px solid var(--feel-playground-border-color, #8d8d8d);
+  border-top: 1px solid var(--feel-playground-border-color, #e6e7e8);
 }
 
 .feel-playground__section {
@@ -121,13 +134,13 @@
 }
 
 .feel-playground__context {
-  border-right: 1px solid var(--feel-playground-border-color, #8d8d8d);
+  border-right: 1px solid var(--feel-playground-border-color, #e6e7e8);
 }
 
 .feel-playground__result-body {
   min-height: 0;
   overflow: auto;
-  padding: 4px 6px;
+  padding: 6px;
   color: var(--feel-playground-muted-text-color, #525252);
   font-family: var(--feel-playground-monospace-font-family, "IBM Plex Mono", "SFMono-Regular", Consolas, monospace);
   font-size: 14px;
@@ -151,16 +164,15 @@
   color: var(--feel-playground-focus-color, #0f62fe);
 }
 
-.feel-playground__status.is-success {
+.feel-playground__status-icon.success {
   color: var(--feel-playground-success-color, #198038);
 }
 
-.feel-playground__status.is-warning,
-.feel-playground__status.is-unavailable {
-  color: var(--feel-playground-warning-color, #8e6a00);
+.feel-playground__status-icon.warning {
+  color: var(--feel-playground-warning-color, #f1c21b);
 }
 
-.feel-playground__status.is-error {
+.feel-playground__status-icon.error {
   color: var(--feel-playground-error-color, #da1e28);
 }
 
@@ -183,7 +195,6 @@
 }
 
 .feel-playground__warnings {
-  color: var(--feel-playground-warning-color, #5c4400);
   border-bottom: 1px solid var(--feel-playground-section-background-color, #f4f4f4);
   padding-bottom: 6px;
   margin-bottom: 6px;

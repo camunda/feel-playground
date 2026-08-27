@@ -15,6 +15,7 @@ export interface FeelVariable {
 interface ExpressionEditorProps {
   value: string;
   onChange(value: string): void;
+  onValidityChange(valid: boolean): void;
   dialect: FeelDialect;
   variables: FeelVariable[];
 }
@@ -22,12 +23,18 @@ interface ExpressionEditorProps {
 export function ExpressionEditor({
   value,
   onChange,
+  onValidityChange,
   dialect,
   variables
 }: ExpressionEditorProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<FeelEditor | null>(null);
   const valueRef = useRef(value);
+  const onChangeRef = useRef(onChange);
+  const onValidityChangeRef = useRef(onValidityChange);
+
+  onChangeRef.current = onChange;
+  onValidityChangeRef.current = onValidityChange;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -47,8 +54,11 @@ export function ExpressionEditor({
       extensions: [lineNumbers()],
       onChange: nextValue => {
         valueRef.current = nextValue;
-        onChange(nextValue);
+        onChangeRef.current(nextValue);
       },
+      onLint: reports => onValidityChangeRef.current(
+        !reports.some(report => report.type === 'Syntax Error')
+      ),
       value,
       variables
     });
@@ -59,7 +69,7 @@ export function ExpressionEditor({
       editorRef.current = null;
       container.replaceChildren();
     };
-  }, [dialect, onChange]);
+  }, [dialect]);
 
   useEffect(() => {
     if (!editorRef.current || valueRef.current === value) {

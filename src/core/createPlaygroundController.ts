@@ -10,6 +10,7 @@ import type {
 const INITIAL_STATE: PlaygroundState = { status: 'idle' };
 const INITIAL_INPUT: PlaygroundInput = {
   expression: '',
+  expressionValid: true,
   context: '',
   dialect: 'expression'
 };
@@ -63,6 +64,16 @@ export function createPlaygroundController(
 
     if (!expression) {
       setState(INITIAL_STATE);
+      return;
+    }
+
+    if (input.expressionValid === null) {
+      setState({ status: 'validating-expression' });
+      return;
+    }
+
+    if (input.expressionValid === false) {
+      setState({ status: 'invalid-expression' });
       return;
     }
 
@@ -163,6 +174,7 @@ export function createPlaygroundController(
 
 function isSameInput(current: PlaygroundInput, next: PlaygroundInput): boolean {
   return current.expression === next.expression
+    && current.expressionValid === next.expressionValid
     && current.context === next.context
     && current.dialect === next.dialect
     && current.onEvaluate === next.onEvaluate

@@ -2,6 +2,7 @@ import type {
   EvaluationWarning,
   PlaygroundState
 } from '../core';
+import { StatusIcon } from './StatusIcon';
 
 interface ResultViewProps {
   state: PlaygroundState;
@@ -19,7 +20,7 @@ export function ResultView({ state }: ResultViewProps) {
         {state.status === 'warning' && (
           <div className="feel-playground__warnings">
             {state.warnings.map((warning, index) => (
-              <p key={index}>{formatWarning(warning)}</p>
+              <Warning key={index} warning={warning} />
             ))}
           </div>
         )}
@@ -33,8 +34,10 @@ function Result({ state }: ResultViewProps) {
   switch (state.status) {
     case 'idle':
       return <p>Enter an expression to evaluate.</p>;
+    case 'validating-expression':
+    case 'invalid-expression':
     case 'invalid-context':
-      return null;
+      return <p>Enter a valid FEEL expression and context to evaluate.</p>;
     case 'scheduled':
       return <p>Waiting for input to settle…</p>;
     case 'loading':
@@ -54,11 +57,22 @@ function Result({ state }: ResultViewProps) {
 }
 
 function Status({ status }: { status: PlaygroundState['status'] }) {
-  if (['idle', 'invalid-context', 'scheduled'].includes(status)) {
-    return null;
+  switch (status) {
+    case 'idle':
+    case 'validating-expression':
+    case 'invalid-expression':
+    case 'invalid-context':
+    case 'scheduled':
+      return null;
+    case 'loading':
+      return <span className="feel-playground__status is-loading">loading</span>;
+    case 'unavailable':
+      return <StatusIcon status="warning" />;
+    case 'success':
+    case 'warning':
+    case 'error':
+      return <StatusIcon status={status} />;
   }
-
-  return <span className={`feel-playground__status is-${status}`}>{status}</span>;
 }
 
 function formatResult(result: unknown): string {
@@ -71,6 +85,30 @@ function formatResult(result: unknown): string {
   return typeof serialized === 'undefined' ? String(result) : serialized;
 }
 
-function formatWarning(warning: EvaluationWarning): string {
-  return warning.message;
+function Warning({ warning }: { warning: EvaluationWarning }) {
+  const type = getWarningType(warning);
+
+  if (!type) {
+    return <p>{warning.message}</p>;
+  }
+
+  const message = warning.message.replace(new RegExp(`^${type}:\\s*`, 'i'), '');
+
+  return (
+    <p>
+      <strong>{type}:</strong>{message && ` ${message}`}
+    </p>
+  );
+}
+
+function getWarningType(warning: EvaluationWarning): 'No Variable Found' | 'Invalid Type' | undefined {
+  const type = warning.type?.toLowerCase().replaceAll('_', ' ');
+
+  if (type === 'no variable found' || /^no variable found\b/i.test(warning.message)) {
+    return 'No Variable Found';
+  }
+
+  if (type === 'invalid type' || /^(invalid type:|can't add\b)/i.test(warning.message)) {
+    return 'Invalid Type';
+  }
 }

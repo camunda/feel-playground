@@ -7,6 +7,8 @@ import { Compartment, EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { basicSetup } from 'codemirror';
 
+import { StatusIcon } from './StatusIcon';
+
 interface ContextEditorProps {
   value: string;
   onChange(value: string): void;
@@ -106,7 +108,7 @@ export function ContextEditor({ value, onChange, error }: ContextEditorProps) {
     <section className="feel-playground__section feel-playground__context">
       <div className="feel-playground__section-heading">
         <h3>Context</h3>
-        {error && <span className="feel-playground__status is-error">invalid</span>}
+        {error && <StatusIcon status="error" />}
       </div>
 
       <div

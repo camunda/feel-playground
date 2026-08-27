@@ -8,6 +8,7 @@ declare module '@bpmn-io/feel-editor' {
     dialect?: FeelDialect;
     extensions?: unknown[];
     onChange?(value: string): void;
+    onLint?(reports: Array<{ type?: string }>): void;
     value?: string;
     variables?: FeelVariable[];
   }

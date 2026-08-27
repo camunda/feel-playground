@@ -29,6 +29,7 @@ export type Evaluate = (
 
 export interface PlaygroundInput {
   expression: string;
+  expressionValid?: boolean | null;
   context: string;
   dialect: FeelDialect;
   onEvaluate?: Evaluate;
@@ -37,6 +38,8 @@ export interface PlaygroundInput {
 
 export type PlaygroundState =
   | { status: 'idle' }
+  | { status: 'validating-expression' }
+  | { status: 'invalid-expression' }
   | { status: 'invalid-context'; error: string }
   | { status: 'unavailable'; message: string }
   | { status: 'scheduled' }
