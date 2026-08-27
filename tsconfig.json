@@ -18,6 +18,7 @@
   "include": [
     "example",
     "src",
+    "test",
     "vite.config.ts",
     "vite.lib.config.ts"
   ]
