@@ -71,6 +71,7 @@
 }
 
 .feel-playground__expression-editor .cm-gutters {
+  background: var(--feel-playground-gutters-background-color, #f4f4f4);
   width: 40px;
 }
 
