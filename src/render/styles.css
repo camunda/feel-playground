@@ -74,6 +74,11 @@
   width: 40px;
 }
 
+.feel-playground__expression-editor .cm-gutterElement.feel-playground__error-line-number {
+  color: var(--feel-playground-error-color, #da1e28);
+  font-weight: 500;
+}
+
 .feel-playground__diagnostics {
   flex: none;
   max-height: 120px;

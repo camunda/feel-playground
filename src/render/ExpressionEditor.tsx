@@ -8,6 +8,7 @@ import {
   DiagnosticList,
   type PlaygroundDiagnostic
 } from './DiagnosticList';
+import { createErrorLineNumbers } from './errorLineNumbers';
 
 export interface FeelVariable {
   name: string;
@@ -56,6 +57,7 @@ export function ExpressionEditor({
     }
 
     valueRef.current = value;
+    const errorLineNumbers = createErrorLineNumbers();
 
     const editor = new FeelEditor({
       container,
@@ -63,14 +65,16 @@ export function ExpressionEditor({
         'aria-label': 'FEEL expression'
       },
       dialect,
-      extensions: [lineNumbers()],
+      extensions: [lineNumbers(), errorLineNumbers.extension],
       onChange: nextValue => {
         valueRef.current = nextValue;
+        errorLineNumbers.update([]);
         onChangeRef.current(nextValue);
       },
       onLint: reports => {
         const errors = reports.filter(isError);
 
+        errorLineNumbers.update(errors.map(error => error.from));
         onErrorsChangeRef.current(errors);
         onValidityChangeRef.current(errors.length === 0);
       },
