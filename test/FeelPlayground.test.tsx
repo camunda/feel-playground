@@ -192,6 +192,41 @@ describe('<FeelPlayground>', () => {
   });
 
 
+  it('should toggle the evaluation pane on resize handle click', () => {
+    // given
+    renderPlayground();
+
+    const separator = screen.getByRole('separator', { name: 'Resize Context and Result' });
+    const playground = separator.parentElement!;
+    const evaluation = playground.querySelector<HTMLElement>('.feel-playground__evaluation')!;
+    const headings = evaluation.querySelectorAll<HTMLElement>('.feel-playground__section-heading');
+
+    separator.setPointerCapture = vi.fn();
+    separator.releasePointerCapture = vi.fn();
+    vi.spyOn(playground, 'getBoundingClientRect').mockReturnValue({ height: 500 } as DOMRect);
+    vi.spyOn(evaluation, 'getBoundingClientRect').mockImplementation(() => ({
+      height: playground.style.gridTemplateRows.endsWith('40px') ? 40 : 200
+    } as DOMRect));
+    headings.forEach(heading => {
+      vi.spyOn(heading, 'getBoundingClientRect').mockReturnValue({ height: 40 } as DOMRect);
+    });
+
+    // when
+    fireEvent.pointerDown(separator, { clientY: 200, pointerId: 1 });
+    fireEvent.pointerUp(separator, { clientY: 200, pointerId: 1 });
+
+    // then
+    expect(playground.style.gridTemplateRows).toBe('minmax(96px, 1fr) 5px 40px');
+
+    // when
+    fireEvent.pointerDown(separator, { clientY: 200, pointerId: 1 });
+    fireEvent.pointerUp(separator, { clientY: 200, pointerId: 1 });
+
+    // then
+    expect(playground.style.gridTemplateRows).toBe('minmax(96px, 1fr) 5px 200px');
+  });
+
+
   it('should explain the context and result panes', () => {
     // when
     renderPlayground();

@@ -55,7 +55,12 @@ export function FeelPlayground({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const controllerRef = useRef<PlaygroundController | null>(null);
   const evaluationRef = useRef<HTMLDivElement | null>(null);
-  const resizeRef = useRef<{ startHeight: number; startY: number } | null>(null);
+  const resizeRef = useRef<{
+    moved: boolean;
+    startHeight: number;
+    startY: number;
+  } | null>(null);
+  const openEvaluationHeightRef = useRef<number | null>(null);
   const [state, setState] = useState<PlaygroundState>({ status: 'idle' });
   const [expressionValid, setExpressionValid] = useState<boolean | null>(null);
   const [expressionErrors, setExpressionErrors] = useState<FeelLintReport[]>([]);
@@ -116,6 +121,7 @@ export function FeelPlayground({
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
     resizeRef.current = {
+      moved: false,
       startHeight: evaluation.getBoundingClientRect().height,
       startY: event.clientY
     };
@@ -128,16 +134,42 @@ export function FeelPlayground({
       return;
     }
 
+    if (event.clientY === resize.startY) {
+      return;
+    }
+
+    resize.moved = true;
     resizeEvaluation(resize.startHeight + resize.startY - event.clientY);
   };
 
   const handleResizeEnd = (event: PointerEvent<HTMLDivElement>) => {
-    if (!resizeRef.current) {
+    const resize = resizeRef.current;
+
+    if (!resize) {
       return;
     }
 
     resizeRef.current = null;
     event.currentTarget.releasePointerCapture(event.pointerId);
+
+    const evaluation = evaluationRef.current;
+
+    if (!evaluation) {
+      return;
+    }
+
+    const minimum = getCollapsedEvaluationHeight(evaluation);
+
+    if (!resize.moved) {
+      if (resize.startHeight <= minimum) {
+        resizeEvaluation(openEvaluationHeightRef.current || minimum);
+      } else {
+        openEvaluationHeightRef.current = resize.startHeight;
+        resizeEvaluation(minimum);
+      }
+    } else if (evaluation.getBoundingClientRect().height > minimum) {
+      openEvaluationHeightRef.current = evaluation.getBoundingClientRect().height;
+    }
   };
 
   const handleResizeKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
