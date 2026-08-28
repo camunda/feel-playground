@@ -2,13 +2,25 @@ import type {
   EvaluationWarning,
   PlaygroundState
 } from '../core';
+import {
+  DiagnosticList,
+  type PlaygroundDiagnostic
+} from './DiagnosticList';
 import { StatusIcon } from './StatusIcon';
 
 interface ResultViewProps {
   state: PlaygroundState;
+  expression?: string;
+  expressionErrors?: PlaygroundDiagnostic[];
+  onSelectExpressionError?(position: number): void;
 }
 
-export function ResultView({ state }: ResultViewProps) {
+export function ResultView({
+  state,
+  expression = '',
+  expressionErrors = [],
+  onSelectExpressionError
+}: ResultViewProps) {
   return (
     <section className="feel-playground__section feel-playground__result" aria-live="polite">
       <div className="feel-playground__section-heading">
@@ -24,8 +36,15 @@ export function ResultView({ state }: ResultViewProps) {
             ))}
           </div>
         )}
-        <Result state={state} />
+        <Result state={state} expressionErrors={expressionErrors} />
       </div>
+
+      <DiagnosticList
+        diagnostics={expressionErrors}
+        label="Expression errors"
+        value={expression}
+        onSelect={onSelectExpressionError}
+      />
 
       <p className="feel-playground__pane-hint">
         Updates when the expression or context changes.
@@ -34,14 +53,18 @@ export function ResultView({ state }: ResultViewProps) {
   );
 }
 
-function Result({ state }: ResultViewProps) {
+function Result({ state, expressionErrors = [] }: ResultViewProps) {
   switch (state.status) {
     case 'idle':
       return <p>Enter an expression to evaluate.</p>;
     case 'validating-expression':
+      return <p>Checking your FEEL expression before evaluation…</p>;
     case 'invalid-expression':
+      return <p>Fix the errors in your FEEL expression to evaluate it.</p>;
     case 'invalid-context':
-      return <p>Enter a valid FEEL expression and context to evaluate.</p>;
+      return expressionErrors.length
+        ? <p>Fix the errors in your FEEL expression to evaluate it.</p>
+        : <p>Fix the errors in your context to evaluate the expression.</p>;
     case 'scheduled':
     case 'loading':
       return <p>Evaluating on the configured cluster…</p>;
@@ -61,9 +84,10 @@ function Status({ status }: { status: PlaygroundState['status'] }) {
     case 'validating-expression':
     case 'invalid-expression':
     case 'invalid-context':
+      return null;
     case 'scheduled':
     case 'loading':
-      return null;
+      return <StatusIcon status="loading" />;
     case 'unavailable':
       return <StatusIcon status="warning" />;
     case 'success':

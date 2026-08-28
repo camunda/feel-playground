@@ -32,7 +32,7 @@ describe('<ResultView>', () => {
     renderResult({ status: 'invalid-expression' });
 
     // then
-    expect(screen.getByText('Enter a valid FEEL expression and context to evaluate.')).toBeTruthy();
+    expect(screen.getByText('Fix the errors in your FEEL expression to evaluate it.')).toBeTruthy();
     expect(screen.queryByRole('img')).toBeNull();
   });
 
@@ -42,7 +42,7 @@ describe('<ResultView>', () => {
     renderResult({ status: 'validating-expression' });
 
     // then
-    expect(screen.getByText('Enter a valid FEEL expression and context to evaluate.')).toBeTruthy();
+    expect(screen.getByText('Checking your FEEL expression before evaluation…')).toBeTruthy();
     expect(screen.queryByRole('img')).toBeNull();
   });
 
@@ -52,8 +52,28 @@ describe('<ResultView>', () => {
     renderResult({ status: 'invalid-context', error: 'Invalid JSON' });
 
     // then
-    expect(screen.getByText('Enter a valid FEEL expression and context to evaluate.')).toBeTruthy();
+    expect(screen.getByText('Fix the errors in your context to evaluate the expression.')).toBeTruthy();
     expect(screen.queryByRole('img')).toBeNull();
+  });
+
+
+  it('should prioritize expression errors over context errors', () => {
+    // when
+    render(
+      <ResultView
+        state={{ status: 'invalid-context', error: 'Invalid JSON' }}
+        expressionErrors={[{
+          from: 0,
+          message: 'Unexpected token.',
+          severity: 'error',
+          to: 1
+        }]}
+      />
+    );
+
+    // then
+    expect(screen.getByText('Fix the errors in your FEEL expression to evaluate it.')).toBeTruthy();
+    expect(screen.queryByText(/errors in your context/)).toBeNull();
   });
 
 
@@ -63,6 +83,7 @@ describe('<ResultView>', () => {
 
     // then
     expect(screen.getByText('Evaluating on the configured cluster…')).toBeTruthy();
+    expect(screen.getByRole('img', { name: 'Loading' })).toBeTruthy();
   });
 
 
@@ -72,7 +93,7 @@ describe('<ResultView>', () => {
 
     // then
     expect(screen.getByText('Evaluating on the configured cluster…')).toBeTruthy();
-    expect(screen.queryByText('loading')).toBeNull();
+    expect(screen.getByRole('img', { name: 'Loading' })).toBeTruthy();
   });
 
 

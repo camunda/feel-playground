@@ -16,6 +16,7 @@ import {
 import { ContextEditor } from './ContextEditor';
 import {
   ExpressionEditor,
+  type ExpressionEditorHandle,
   type FeelLintReport,
   type FeelVariable
 } from './ExpressionEditor';
@@ -55,6 +56,7 @@ export function FeelPlayground({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const controllerRef = useRef<PlaygroundController | null>(null);
   const evaluationRef = useRef<HTMLDivElement | null>(null);
+  const expressionEditorRef = useRef<ExpressionEditorHandle | null>(null);
   const resizeRef = useRef<{
     moved: boolean;
     startHeight: number;
@@ -203,11 +205,11 @@ export function FeelPlayground({
           )}
         </div>
         <ExpressionEditor
+          ref={expressionEditorRef}
           value={expression}
           onChange={handleExpressionChange}
           onValidityChange={setExpressionValid}
           onErrorsChange={setExpressionErrors}
-          errors={expressionErrors}
           dialect={dialect}
           variables={variables}
         />
@@ -232,7 +234,12 @@ export function FeelPlayground({
           onChange={onContextChange}
           error={state.status === 'invalid-context' ? state.error : undefined}
         />
-        <ResultView state={state} />
+        <ResultView
+          state={state}
+          expression={expression}
+          expressionErrors={expressionErrors}
+          onSelectExpressionError={position => expressionEditorRef.current?.focus(position)}
+        />
       </div>
     </div>
   );

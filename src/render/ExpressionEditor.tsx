@@ -1,13 +1,15 @@
-import { useEffect, useRef } from 'react';
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef
+} from 'react';
 
 import FeelEditor from '@bpmn-io/feel-editor';
 import { lineNumbers } from '@codemirror/view';
 
 import type { FeelDialect } from '../core';
-import {
-  DiagnosticList,
-  type PlaygroundDiagnostic
-} from './DiagnosticList';
+import type { PlaygroundDiagnostic } from './DiagnosticList';
 import { createErrorLineNumbers } from './errorLineNumbers';
 
 export interface FeelVariable {
@@ -19,25 +21,27 @@ export interface FeelVariable {
 
 export type FeelLintReport = PlaygroundDiagnostic;
 
+export interface ExpressionEditorHandle {
+  focus(position: number): void;
+}
+
 interface ExpressionEditorProps {
   value: string;
   onChange(value: string): void;
   onValidityChange(valid: boolean): void;
   onErrorsChange(errors: FeelLintReport[]): void;
-  errors: FeelLintReport[];
   dialect: FeelDialect;
   variables: FeelVariable[];
 }
 
-export function ExpressionEditor({
+export const ExpressionEditor = forwardRef<ExpressionEditorHandle, ExpressionEditorProps>(function ExpressionEditor({
   value,
   onChange,
   onValidityChange,
   onErrorsChange,
-  errors,
   dialect,
   variables
-}: ExpressionEditorProps) {
+}, ref) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<FeelEditor | null>(null);
   const valueRef = useRef(value);
@@ -48,6 +52,10 @@ export function ExpressionEditor({
   onChangeRef.current = onChange;
   onValidityChangeRef.current = onValidityChange;
   onErrorsChangeRef.current = onErrorsChange;
+
+  useImperativeHandle(ref, () => ({
+    focus: position => editorRef.current?.focus(position)
+  }), []);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -103,18 +111,8 @@ export function ExpressionEditor({
     editorRef.current?.setVariables(variables);
   }, [variables]);
 
-  return (
-    <>
-      <div className="feel-playground__expression-editor" ref={containerRef} />
-      <DiagnosticList
-        diagnostics={errors}
-        label="Expression errors"
-        value={value}
-        onSelect={position => editorRef.current?.focus(position)}
-      />
-    </>
-  );
-}
+  return <div className="feel-playground__expression-editor" ref={containerRef} />;
+});
 
 function isError(report: FeelLintReport) {
   return report.severity === 'error' || report.type === 'Syntax Error';
