@@ -1,6 +1,6 @@
 declare module '@bpmn-io/feel-editor' {
   import type { FeelDialect } from './core';
-  import type { FeelVariable } from './render/ExpressionEditor';
+  import type { FeelLintReport, FeelVariable } from './render/ExpressionEditor';
 
   interface FeelEditorConfig {
     container: HTMLElement;
@@ -8,7 +8,7 @@ declare module '@bpmn-io/feel-editor' {
     dialect?: FeelDialect;
     extensions?: unknown[];
     onChange?(value: string): void;
-    onLint?(reports: Array<{ type?: string }>): void;
+    onLint?(reports: FeelLintReport[]): void;
     value?: string;
     variables?: FeelVariable[];
   }

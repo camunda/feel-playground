@@ -40,6 +40,15 @@
   font-size: 12px;
 }
 
+.feel-playground__section-heading .feel-playground__error-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--feel-playground-error-color, #da1e28);
+  font-size: 14px;
+  font-family: var(--feel-playground-monospace-font-family, "IBM Plex Mono", "SFMono-Regular", Consolas, monospace);
+}
+
 .feel-playground__section-heading h3 {
   font-size: 14px;
   font-weight: 500;
@@ -63,6 +72,63 @@
 .feel-playground__expression-editor .cm-gutters {
   background: var(--feel-playground-gutters-background-color, #f4f4f4);
   width: 40px;
+}
+
+.feel-playground__diagnostics {
+  flex: none;
+  max-height: 120px;
+  overflow: auto;
+  border-top: 1px solid var(--feel-playground-border-color, #e6e7e8);
+  background: var(--feel-playground-background-color, #fff);
+}
+
+.feel-playground__diagnostic {
+  -webkit-appearance: none;
+  appearance: none;
+  display: grid;
+  width: 100%;
+  min-height: 0;
+  grid-template-columns: 16px auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 0;
+  color: var(--feel-playground-muted-text-color, #525252);
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: left;
+}
+
+.feel-playground__diagnostic:hover {
+  background: var(--feel-playground-section-background-color, #f4f4f4);
+}
+
+.feel-playground__diagnostic:focus-visible {
+  outline: 2px solid var(--feel-playground-link-color, #0f62fe);
+  outline-offset: -2px;
+}
+
+.feel-playground__diagnostic + .feel-playground__diagnostic {
+  border-top: 1px solid var(--feel-playground-border-color, #e6e7e8);
+}
+
+.feel-playground__diagnostic-position {
+  color: var(--feel-playground-link-color, #0f62fe);
+  line-height: inherit;
+}
+
+.feel-playground__diagnostic-message {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.feel-playground__diagnostic strong {
+  color: var(--feel-playground-text-color, #161616);
+  font-weight: 600;
 }
 
 .feel-playground .cm-content {
@@ -120,8 +186,15 @@
 .feel-playground__context,
 .feel-playground__result {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
+}
+
+.feel-playground__context {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.feel-playground__result {
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 .feel-playground__context {

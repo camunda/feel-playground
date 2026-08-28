@@ -1,6 +1,7 @@
 import {
   act,
   cleanup,
+  fireEvent,
   render,
   screen,
   waitFor,
@@ -18,8 +19,15 @@ import type { Evaluate } from '../src/core';
 import { FeelPlayground } from '../src/render/FeelPlayground';
 
 const feelEditor = vi.hoisted(() => ({
+  focus: vi.fn(),
   onChange: undefined as ((value: string) => void) | undefined,
-  onLint: undefined as ((reports: Array<{ type?: string }>) => void) | undefined
+  onLint: undefined as ((reports: Array<{
+    from: number;
+    message: string;
+    severity: 'error' | 'warning';
+    to: number;
+    type?: string;
+  }>) => void) | undefined
 }));
 
 vi.mock('@bpmn-io/feel-editor', () => ({
@@ -27,7 +35,13 @@ vi.mock('@bpmn-io/feel-editor', () => ({
     constructor(config: {
       container: HTMLElement;
       onChange?(value: string): void;
-      onLint?(reports: Array<{ type?: string }>): void;
+      onLint?(reports: Array<{
+        from: number;
+        message: string;
+        severity: 'error' | 'warning';
+        to: number;
+        type?: string;
+      }>): void;
     }) {
       feelEditor.onChange = config.onChange;
       feelEditor.onLint = config.onLint;
@@ -41,12 +55,17 @@ vi.mock('@bpmn-io/feel-editor', () => ({
     setValue() { }
 
     setVariables() { }
+
+    focus(position: number) {
+      feelEditor.focus(position);
+    }
   }
 }));
 
 afterEach(() => {
   feelEditor.onChange = undefined;
   feelEditor.onLint = undefined;
+  feelEditor.focus.mockReset();
   cleanup();
 });
 
@@ -57,22 +76,57 @@ describe('<FeelPlayground>', () => {
     renderPlayground();
 
     // when
-    act(() => feelEditor.onLint?.([{ type: 'Syntax Error' }]));
+    act(() => feelEditor.onLint?.([
+      {
+        from: 2,
+        message: 'The operator needs a right-hand value.',
+        severity: 'error',
+        to: 3,
+        type: 'Syntax Error'
+      },
+      {
+        from: 4,
+        message: 'Unexpected token.',
+        severity: 'error',
+        to: 5,
+        type: 'Syntax Error'
+      }
+    ]));
 
     // then
     const expression = screen.getByRole('heading', { name: 'FEEL expression' }).closest('section')!;
     const result = screen.getByRole('heading', { name: 'Result' }).closest('section')!;
 
-    expect(within(expression).getByRole('img', { name: 'Error' })).toBeTruthy();
+    expect(within(expression).getAllByRole('img', { name: 'Error' })).toHaveLength(3);
+    expect(within(expression).getByText('2')).toBeTruthy();
+    const firstError = within(expression).getByRole('button', {
+      name: /The operator needs a right-hand value\./
+    });
+    expect(firstError).toBeTruthy();
+    expect(within(expression).getByRole('button', { name: /Unexpected token\./ })).toBeTruthy();
+    expect(within(expression).getAllByText('Syntax error.')).toHaveLength(2);
+    expect(within(expression).getByText('The operator needs a right-hand value.')).toBeTruthy();
     expect(within(result).queryByRole('img', { name: 'Error' })).toBeNull();
     expect(await screen.findByText('Enter a valid FEEL expression and context to evaluate.')).toBeTruthy();
+
+    // when
+    fireEvent.click(firstError);
+
+    // then
+    expect(feelEditor.focus).toHaveBeenCalledWith(2);
   });
 
 
   it('should clear an expression error reported by the editor', () => {
     // given
     renderPlayground();
-    act(() => feelEditor.onLint?.([{ type: 'Syntax Error' }]));
+    act(() => feelEditor.onLint?.([{
+      from: 2,
+      message: 'The operator needs a right-hand value.',
+      severity: 'error',
+      to: 3,
+      type: 'Syntax Error'
+    }]));
 
     // when
     act(() => feelEditor.onLint?.([]));
@@ -131,7 +185,9 @@ describe('<FeelPlayground>', () => {
     const context = screen.getByRole('heading', { name: 'Context' }).closest('section')!;
     const result = screen.getByRole('heading', { name: 'Result' }).closest('section')!;
 
-    expect(await within(context).findByRole('img', { name: 'Error' })).toBeTruthy();
+    expect(await within(context).findAllByRole('img', { name: 'Error' })).toHaveLength(2);
+    expect(within(context).getByRole('button', { name: /Context error/ })).toBeTruthy();
+    expect(within(context).queryByText(/at position \d+/)).toBeNull();
     expect(within(result).queryByRole('img', { name: 'Error' })).toBeNull();
     expect(screen.getByRole('textbox', { name: 'Evaluation context' }).getAttribute('aria-invalid')).toBe('true');
   });
@@ -143,7 +199,22 @@ describe('<FeelPlayground>', () => {
 
     // then
     const context = screen.getByRole('heading', { name: 'Context' }).closest('section')!;
-    expect(await within(context).findByRole('img', { name: 'Error' })).toBeTruthy();
+    expect(await within(context).findAllByRole('img', { name: 'Error' })).toHaveLength(2);
+  });
+
+
+  it('should focus a context error reported by the editor', async () => {
+    // given
+    renderPlayground({ context: '{' });
+
+    const context = screen.getByRole('heading', { name: 'Context' }).closest('section')!;
+    const error = await within(context).findByRole('button', { name: /Context error/ });
+
+    // when
+    fireEvent.click(error);
+
+    // then
+    expect(document.activeElement).toBe(screen.getByRole('textbox', { name: 'Evaluation context' }));
   });
 
 
@@ -152,15 +223,21 @@ describe('<FeelPlayground>', () => {
     renderPlayground({ context: '{' });
 
     // when
-    act(() => feelEditor.onLint?.([{ type: 'Syntax Error' }]));
+    act(() => feelEditor.onLint?.([{
+      from: 2,
+      message: 'The operator needs a right-hand value.',
+      severity: 'error',
+      to: 3,
+      type: 'Syntax Error'
+    }]));
 
     // then
     const expression = screen.getByRole('heading', { name: 'FEEL expression' }).closest('section')!;
     const context = screen.getByRole('heading', { name: 'Context' }).closest('section')!;
     const result = screen.getByRole('heading', { name: 'Result' }).closest('section')!;
 
-    expect(within(expression).getByRole('img', { name: 'Error' })).toBeTruthy();
-    expect(await within(context).findByRole('img', { name: 'Error' })).toBeTruthy();
+    expect(within(expression).getAllByRole('img', { name: 'Error' })).toHaveLength(2);
+    expect(await within(context).findAllByRole('img', { name: 'Error' })).toHaveLength(2);
     expect(within(result).queryByRole('img', { name: 'Error' })).toBeNull();
   });
 });

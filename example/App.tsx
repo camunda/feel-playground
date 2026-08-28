@@ -10,6 +10,12 @@ const INITIAL_EXPRESSION = `{
   url: "https://" + base + ":" + string(protocol)
 }`;
 
+const ERROR_EXPRESSION = `{
+  url: "https://" + base + ":" + string(protocol),
+  timeout: if protocol = 443 then 30 else,
+  secure: protocol =
+}`;
+
 const INITIAL_CONTEXT = `{
   "base": "google.com",
   "protocol": 8080
@@ -17,6 +23,19 @@ const INITIAL_CONTEXT = `{
 
 const WARNING_CONTEXT = `{
   "base": "google.com"
+}`;
+
+const ERROR_CONTEXT = `{
+  "base": "api.example.com",
+  "protocol": 443
+  "request": {
+    "id": "req-8472",
+    "environment": "production"
+  },
+  "headers": {
+    "Accept": "application/json",
+    "User-Agent": "order-service/2.4"
+  }
 }`;
 
 type Preview =
@@ -122,9 +141,9 @@ function getPreviewValues(preview: Preview) {
     case 'empty':
       return { expression: '', context: INITIAL_CONTEXT };
     case 'expression-error':
-      return { expression: 'base +', context: INITIAL_CONTEXT };
+      return { expression: ERROR_EXPRESSION, context: INITIAL_CONTEXT };
     case 'context-error':
-      return { expression: INITIAL_EXPRESSION, context: '{' };
+      return { expression: INITIAL_EXPRESSION, context: ERROR_CONTEXT };
     case 'warning':
       return { expression: INITIAL_EXPRESSION, context: WARNING_CONTEXT };
     default:

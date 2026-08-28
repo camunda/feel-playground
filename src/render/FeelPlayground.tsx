@@ -8,7 +8,11 @@ import {
   type PlaygroundState
 } from '../core';
 import { ContextEditor } from './ContextEditor';
-import { ExpressionEditor, type FeelVariable } from './ExpressionEditor';
+import {
+  ExpressionEditor,
+  type FeelLintReport,
+  type FeelVariable
+} from './ExpressionEditor';
 import { ResultView } from './ResultView';
 import { StatusIcon } from './StatusIcon';
 
@@ -42,9 +46,11 @@ export function FeelPlayground({
   const controllerRef = useRef<PlaygroundController | null>(null);
   const [state, setState] = useState<PlaygroundState>({ status: 'idle' });
   const [expressionValid, setExpressionValid] = useState<boolean | null>(null);
+  const [expressionErrors, setExpressionErrors] = useState<FeelLintReport[]>([]);
 
   const handleExpressionChange = (nextExpression: string) => {
     setExpressionValid(null);
+    setExpressionErrors([]);
     onExpressionChange(nextExpression);
   };
 
@@ -76,12 +82,19 @@ export function FeelPlayground({
       <section className="feel-playground__section feel-playground__expression">
         <div className="feel-playground__section-heading">
           <h3>{dialect === 'unaryTests' ? 'Unary tests' : 'FEEL expression'}</h3>
-          {expressionValid === false && <StatusIcon status="error" />}
+          {expressionErrors.length > 0 && (
+            <span className="feel-playground__error-count">
+              <StatusIcon status="error" />
+              {expressionErrors.length}
+            </span>
+          )}
         </div>
         <ExpressionEditor
           value={expression}
           onChange={handleExpressionChange}
           onValidityChange={setExpressionValid}
+          onErrorsChange={setExpressionErrors}
+          errors={expressionErrors}
           dialect={dialect}
           variables={variables}
         />

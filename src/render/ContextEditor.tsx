@@ -7,6 +7,7 @@ import { Compartment, EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { basicSetup } from 'codemirror';
 
+import { DiagnosticList } from './DiagnosticList';
 import { StatusIcon } from './StatusIcon';
 
 interface ContextEditorProps {
@@ -104,16 +105,45 @@ export function ContextEditor({ value, onChange, error }: ContextEditorProps) {
     ));
   }, [error]);
 
+  const diagnostics = error
+    ? [createDiagnostic(error, value.length)]
+    : [];
+
+  const handleDiagnosticSelect = (position: number) => {
+    const editor = editorRef.current;
+
+    if (!editor) {
+      return;
+    }
+
+    editor.dispatch({
+      selection: { anchor: position },
+      scrollIntoView: true
+    });
+    editor.focus();
+  };
+
   return (
     <section className="feel-playground__section feel-playground__context">
       <div className="feel-playground__section-heading">
         <h3>Context</h3>
-        {error && <StatusIcon status="error" />}
+        {error && (
+          <span className="feel-playground__error-count">
+            <StatusIcon status="error" />
+            1
+          </span>
+        )}
       </div>
 
       <div
         className="feel-playground__context-editor"
         ref={containerRef}
+      />
+      <DiagnosticList
+        diagnostics={diagnostics}
+        label="Context errors"
+        value={value}
+        onSelect={handleDiagnosticSelect}
       />
     </section>
   );
@@ -129,6 +159,7 @@ function createDiagnostic(error: string, documentLength: number): Diagnostic {
     from,
     to: Math.min(from + 1, documentLength),
     severity: 'error',
-    message: error
+    source: 'Context error',
+    message: error.replace(/ at position \d+(?: \(line \d+ column \d+\))?$/, '')
   };
 }
