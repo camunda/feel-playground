@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+  type KeyboardEvent,
+  type PointerEvent,
+  useEffect,
+  useRef,
+  useState
+} from 'react';
 
 import {
   createPlaygroundController,
@@ -17,6 +23,9 @@ import { ResultView } from './ResultView';
 import { StatusIcon } from './StatusIcon';
 
 const EVALUATION_DEBOUNCE = 300;
+const MIN_EXPRESSION_HEIGHT = 96;
+const RESIZE_STEP = 16;
+const SPLITTER_HEIGHT = 5;
 
 /**
  * Controlled FEEL playground. The host owns expression and context persistence
@@ -43,10 +52,14 @@ export function FeelPlayground({
   onEvaluate,
   evaluationUnavailable
 }: FeelPlaygroundProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const controllerRef = useRef<PlaygroundController | null>(null);
+  const evaluationRef = useRef<HTMLDivElement | null>(null);
+  const resizeRef = useRef<{ startHeight: number; startY: number } | null>(null);
   const [state, setState] = useState<PlaygroundState>({ status: 'idle' });
   const [expressionValid, setExpressionValid] = useState<boolean | null>(null);
   const [expressionErrors, setExpressionErrors] = useState<FeelLintReport[]>([]);
+  const [evaluationHeight, setEvaluationHeight] = useState<number | null>(null);
 
   const handleExpressionChange = (nextExpression: string) => {
     setExpressionValid(null);
@@ -77,8 +90,76 @@ export function FeelPlayground({
     });
   }, [expression, expressionValid, context, dialect, onEvaluate, evaluationUnavailable]);
 
+  const resizeEvaluation = (height: number) => {
+    const container = containerRef.current;
+
+    if (!container) {
+      return;
+    }
+
+    const minimum = getCollapsedEvaluationHeight(evaluationRef.current);
+    const maximum = Math.max(
+      minimum,
+      container.getBoundingClientRect().height - SPLITTER_HEIGHT - MIN_EXPRESSION_HEIGHT
+    );
+
+    setEvaluationHeight(Math.min(maximum, Math.max(minimum, height)));
+  };
+
+  const handleResizeStart = (event: PointerEvent<HTMLDivElement>) => {
+    const evaluation = evaluationRef.current;
+
+    if (!evaluation) {
+      return;
+    }
+
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    resizeRef.current = {
+      startHeight: evaluation.getBoundingClientRect().height,
+      startY: event.clientY
+    };
+  };
+
+  const handleResize = (event: PointerEvent<HTMLDivElement>) => {
+    const resize = resizeRef.current;
+
+    if (!resize) {
+      return;
+    }
+
+    resizeEvaluation(resize.startHeight + resize.startY - event.clientY);
+  };
+
+  const handleResizeEnd = (event: PointerEvent<HTMLDivElement>) => {
+    if (!resizeRef.current) {
+      return;
+    }
+
+    resizeRef.current = null;
+    event.currentTarget.releasePointerCapture(event.pointerId);
+  };
+
+  const handleResizeKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const currentHeight = evaluationRef.current?.getBoundingClientRect().height || 0;
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      resizeEvaluation(currentHeight + RESIZE_STEP);
+    } else if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      resizeEvaluation(currentHeight - RESIZE_STEP);
+    }
+  };
+
+  const style = evaluationHeight === null
+    ? undefined
+    : {
+      gridTemplateRows: `minmax(${MIN_EXPRESSION_HEIGHT}px, 1fr) ${SPLITTER_HEIGHT}px ${evaluationHeight}px`
+    };
+
   return (
-    <div className="feel-playground">
+    <div className="feel-playground" ref={containerRef} style={style}>
       <section className="feel-playground__section feel-playground__expression">
         <div className="feel-playground__section-heading">
           <h3>{dialect === 'unaryTests' ? 'Unary tests' : 'FEEL expression'}</h3>
@@ -100,7 +181,20 @@ export function FeelPlayground({
         />
       </section>
 
-      <div className="feel-playground__evaluation">
+      <div
+        aria-label="Resize Context and Result"
+        aria-orientation="horizontal"
+        className="feel-playground__resize-handle"
+        role="separator"
+        tabIndex={0}
+        onKeyDown={handleResizeKeyDown}
+        onPointerDown={handleResizeStart}
+        onPointerMove={handleResize}
+        onPointerUp={handleResizeEnd}
+        onPointerCancel={handleResizeEnd}
+      />
+
+      <div className="feel-playground__evaluation" ref={evaluationRef}>
         <ContextEditor
           value={context}
           onChange={onContextChange}
@@ -110,4 +204,25 @@ export function FeelPlayground({
       </div>
     </div>
   );
+}
+
+function getCollapsedEvaluationHeight(evaluation: HTMLDivElement | null) {
+  if (!evaluation) {
+    return 0;
+  }
+
+  const headings = Array.from(
+    evaluation.querySelectorAll<HTMLElement>('.feel-playground__section-heading')
+  );
+
+  if (!headings.length) {
+    return 0;
+  }
+
+  const columns = getComputedStyle(evaluation).gridTemplateColumns.split(' ').length;
+  const heights = headings.map(heading => heading.getBoundingClientRect().height);
+
+  return columns === 1
+    ? heights.reduce((total, height) => total + height, 0)
+    : Math.max(...heights);
 }

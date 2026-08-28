@@ -177,6 +177,21 @@ describe('<FeelPlayground>', () => {
   });
 
 
+  it('should ignore Home and End when resizing the evaluation pane', () => {
+    // given
+    renderPlayground();
+
+    const separator = screen.getByRole('separator', { name: 'Resize Context and Result' });
+
+    // when
+    fireEvent.keyDown(separator, { key: 'Home' });
+    fireEvent.keyDown(separator, { key: 'End' });
+
+    // then
+    expect(separator.parentElement?.style.gridTemplateRows).toBe('');
+  });
+
+
   it('should show a context error for malformed JSON', async () => {
     // when
     renderPlayground({ context: '{' });

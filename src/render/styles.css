@@ -9,7 +9,7 @@
 
 .feel-playground {
   display: grid;
-  grid-template-rows: minmax(0, 3fr) minmax(0, 2fr);
+  grid-template-rows: minmax(96px, 3fr) 5px minmax(0, 2fr);
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -170,7 +170,31 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   min-height: 0;
   overflow: hidden;
-  border-top: 1px solid var(--feel-playground-border-color, #e6e7e8);
+}
+
+.feel-playground__resize-handle {
+  position: relative;
+  z-index: 1;
+  background: var(--feel-playground-border-color, #e6e7e8);
+  cursor: row-resize;
+  touch-action: none;
+}
+
+.feel-playground__resize-handle::after {
+  position: absolute;
+  inset: 2px 0;
+  background: transparent;
+  content: "";
+  transition: background-color 120ms ease;
+}
+
+.feel-playground__resize-handle:hover::after,
+.feel-playground__resize-handle:focus-visible::after {
+  background: var(--feel-playground-link-color, #0f62fe);
+}
+
+.feel-playground__resize-handle:focus-visible {
+  outline: none;
 }
 
 .feel-playground__section {
