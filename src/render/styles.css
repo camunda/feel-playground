@@ -136,6 +136,7 @@
 }
 
 .feel-playground__context-editor {
+  flex: 1;
   width: 100%;
   height: 100%;
   min-height: 0;
@@ -210,15 +211,15 @@
 .feel-playground__context,
 .feel-playground__result {
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   overflow: hidden;
 }
 
-.feel-playground__context {
-  grid-template-rows: auto minmax(0, 1fr) auto;
-}
-
-.feel-playground__result {
-  grid-template-rows: auto minmax(0, 1fr);
+.feel-playground__context-body {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .feel-playground__context {
@@ -237,6 +238,19 @@
 
 .feel-playground__result-body > p {
   margin: 0;
+}
+
+.feel-playground__pane-hint {
+  min-width: 0;
+  margin: 0;
+  padding: 6px 8px;
+  overflow: hidden;
+  border-top: 1px solid var(--feel-playground-border-color, #e6e7e8);
+  color: var(--feel-playground-muted-text-color, #6f6f6f);
+  font-size: 12px;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .feel-playground__result pre {

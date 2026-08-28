@@ -26,6 +26,10 @@ export function ResultView({ state }: ResultViewProps) {
         )}
         <Result state={state} />
       </div>
+
+      <p className="feel-playground__pane-hint">
+        Updates when the expression or context changes.
+      </p>
     </section>
   );
 }

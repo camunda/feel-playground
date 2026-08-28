@@ -192,6 +192,16 @@ describe('<FeelPlayground>', () => {
   });
 
 
+  it('should explain the context and result panes', () => {
+    // when
+    renderPlayground();
+
+    // then
+    expect(screen.getByText('Add input variables as a JSON object.')).toBeTruthy();
+    expect(screen.getByText('Updates when the expression or context changes.')).toBeTruthy();
+  });
+
+
   it('should show a context error for malformed JSON', async () => {
     // when
     renderPlayground({ context: '{' });

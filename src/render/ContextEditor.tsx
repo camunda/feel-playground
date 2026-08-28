@@ -135,16 +135,22 @@ export function ContextEditor({ value, onChange, error }: ContextEditorProps) {
         )}
       </div>
 
-      <div
-        className="feel-playground__context-editor"
-        ref={containerRef}
-      />
-      <DiagnosticList
-        diagnostics={diagnostics}
-        label="Context errors"
-        value={value}
-        onSelect={handleDiagnosticSelect}
-      />
+      <div className="feel-playground__context-body">
+        <div
+          className="feel-playground__context-editor"
+          ref={containerRef}
+        />
+        <DiagnosticList
+          diagnostics={diagnostics}
+          label="Context errors"
+          value={value}
+          onSelect={handleDiagnosticSelect}
+        />
+      </div>
+
+      <p className="feel-playground__pane-hint">
+        Add input variables as a JSON object.
+      </p>
     </section>
   );
 }
