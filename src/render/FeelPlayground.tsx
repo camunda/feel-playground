@@ -33,6 +33,7 @@ const EVALUATION_DEBOUNCE = 300;
 const MIN_EXPRESSION_HEIGHT = 96;
 const RESIZE_STEP = 16;
 const SPLITTER_HEIGHT = 5;
+const EMPTY_VARIABLES: FeelVariable[] = [];
 
 /**
  * Controlled FEEL playground. The host owns expression and context persistence
@@ -57,7 +58,7 @@ export function FeelPlayground({
   onContextChange,
   resolveContext,
   dialect,
-  variables = [],
+  variables = EMPTY_VARIABLES,
   onEvaluate,
   evaluationUnavailable
 }: FeelPlaygroundProps) {
