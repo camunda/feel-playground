@@ -1,10 +1,31 @@
 {
   "name": "@camunda/feel-playground",
   "version": "0.1.0-alpha.1",
+  "description": "Playground for editing and evaluating FEEL expressions",
+  "license": "MIT",
+  "author": "Camunda Services GmbH",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/camunda/feel-playground.git"
+  },
+  "keywords": [
+    "camunda",
+    "feel",
+    "dmn",
+    "expression",
+    "react"
+  ],
   "type": "module",
+  "main": "./dist/index.js",
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=24.15.0"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
