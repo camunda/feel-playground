@@ -79,7 +79,7 @@ When evaluation is temporarily unavailable, omit `onEvaluate` and explain why wi
 Start a Camunda 8.9+ c8run instance on `http://localhost:8080`, then:
 
 ```sh
-git clone https://github.com/jarekdanielak/feel-playground.git
+git clone https://github.com/camunda/feel-playground.git
 cd feel-playground
 cp cluster.config.example.json cluster.config.json
 npm install
