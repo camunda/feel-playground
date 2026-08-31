@@ -57,6 +57,8 @@ export function Playground() {
 
 Evaluation is remote-only. Authentication, connectivity, and endpoint-specific request mapping remain host responsibilities. The evaluator must return an object containing `result` and a `warnings` array.
 
+The package requires React 19. Its stylesheet includes the Camunda Design System tokens and component styles and defines the playground's appearance; hosts do not need to provide a design-system scope or playground theme variables.
+
 The context is a controlled, serialized JSON value. When `resolveContext` is provided, the playground shows a reload action that resolves a fresh context object, serializes it into the editor, and evaluates the expression again. Context resolution is best-effort; failures preserve the current context.
 
 When evaluation is temporarily unavailable, omit `onEvaluate` and explain why with `evaluationUnavailable`:

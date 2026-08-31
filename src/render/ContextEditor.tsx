@@ -1,11 +1,18 @@
 import { useEffect, useRef } from 'react';
 
 import { feelLight } from '@bpmn-io/cm-theme';
+import {
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from '@camunda/design-system';
 import { json } from '@codemirror/lang-json';
 import { setDiagnostics, type Diagnostic } from '@codemirror/lint';
 import { Compartment, EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { basicSetup } from 'codemirror';
+import { RotateCcw } from 'lucide-react';
 
 import { DiagnosticList } from './DiagnosticList';
 import { StatusIcon } from './StatusIcon';
@@ -130,15 +137,19 @@ export function ContextEditor({ value, onChange, onReset, error }: ContextEditor
         <h3>Context</h3>
         <div className="feel-playground__section-heading-actions">
           {onReset && (
-            <button
-              aria-label="Reload context"
-              className="feel-playground__icon-button"
-              title="Reload context"
-              type="button"
-              onClick={onReset}
-            >
-              <ResetIcon />
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  aria-label="Reset to prefilled context"
+                  size="icon-xs"
+                  variant="ghost"
+                  onClick={onReset}
+                >
+                  <RotateCcw aria-hidden="true" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Reset to prefilled context</TooltipContent>
+            </Tooltip>
           )}
           {error && (
             <span className="feel-playground__error-count">
@@ -166,14 +177,6 @@ export function ContextEditor({ value, onChange, onReset, error }: ContextEditor
         Add input variables as a JSON object.
       </p>
     </section>
-  );
-}
-
-function ResetIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 32 32">
-      <path d="M18,28A12,12,0,1,0,6,16v6.2L2.4,18.6,1,20l6,6,6-6-1.4-1.4L8,22.2V16H8A10,10,0,1,1,18,26Z" />
-    </svg>
   );
 }
 

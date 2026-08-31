@@ -23,17 +23,19 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "react": "^18.2.0 || ^19.0.0",
-    "react-dom": "^18.2.0 || ^19.0.0"
+    "react": ">=19.0.0 <20",
+    "react-dom": ">=19.0.0 <20"
   },
   "dependencies": {
     "@bpmn-io/cm-theme": "^0.2.2",
     "@bpmn-io/feel-editor": "^2.7.1",
+    "@camunda/design-system": "^0.51.0",
     "@codemirror/lang-json": "^6.0.2",
     "@codemirror/lint": "^6.9.7",
     "@codemirror/state": "^6.7.1",
     "@codemirror/view": "^6.43.9",
-    "codemirror": "^6.0.2"
+    "codemirror": "^6.0.2",
+    "lucide-react": "^1.38.0"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.2",

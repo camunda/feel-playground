@@ -259,7 +259,7 @@ describe('<FeelPlayground>', () => {
     onEvaluate.mockClear();
 
     // when
-    fireEvent.click(screen.getByRole('button', { name: 'Reload context' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reset to prefilled context' }));
 
     // then
     await waitFor(() => {
@@ -284,7 +284,7 @@ describe('<FeelPlayground>', () => {
     const context = screen.getByRole('heading', { name: 'Context' }).closest('section')!;
     const result = screen.getByRole('heading', { name: 'Result' }).closest('section')!;
     const contextHeading = within(context).getByRole('heading', { name: 'Context' }).parentElement!;
-    const resetButton = within(contextHeading).getByRole('button', { name: 'Reload context' });
+    const resetButton = within(contextHeading).getByRole('button', { name: 'Reset to prefilled context' });
     const errorIcon = within(contextHeading).getByRole('img', { name: 'Error' });
 
     expect(await within(context).findAllByRole('img', { name: 'Error' })).toHaveLength(2);

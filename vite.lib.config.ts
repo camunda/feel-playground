@@ -20,11 +20,13 @@ export default defineConfig({
       external: [
         '@bpmn-io/cm-theme',
         '@bpmn-io/feel-editor',
+        '@camunda/design-system',
         '@codemirror/lang-json',
         '@codemirror/lint',
         '@codemirror/state',
         '@codemirror/view',
         'codemirror',
+        'lucide-react',
         'react',
         'react-dom/client',
         'react/jsx-runtime'

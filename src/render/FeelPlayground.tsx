@@ -7,6 +7,11 @@ import {
 } from 'react';
 
 import {
+  C4Provider,
+  TooltipProvider
+} from '@camunda/design-system';
+
+import {
   createPlaygroundController,
   type Evaluate,
   type EvaluationContext,
@@ -210,56 +215,60 @@ export function FeelPlayground({
     };
 
   return (
-    <div className="feel-playground" ref={containerRef} style={style}>
-      <section className="feel-playground__section feel-playground__expression">
-        <div className="feel-playground__section-heading">
-          <h3>{dialect === 'unaryTests' ? 'Unary tests' : 'FEEL expression'}</h3>
-          {expressionErrors.length > 0 && (
-            <span className="feel-playground__error-count">
-              <StatusIcon status="error" />
-              {expressionErrors.length}
-            </span>
-          )}
+    <C4Provider>
+      <TooltipProvider>
+        <div className="feel-playground" ref={containerRef} style={style}>
+          <section className="feel-playground__section feel-playground__expression">
+            <div className="feel-playground__section-heading">
+              <h3>{dialect === 'unaryTests' ? 'Unary tests' : 'FEEL expression'}</h3>
+              {expressionErrors.length > 0 && (
+                <span className="feel-playground__error-count">
+                  <StatusIcon status="error" />
+                  {expressionErrors.length}
+                </span>
+              )}
+            </div>
+            <ExpressionEditor
+              ref={expressionEditorRef}
+              value={expression}
+              onChange={handleExpressionChange}
+              onValidityChange={setExpressionValid}
+              onErrorsChange={setExpressionErrors}
+              dialect={dialect}
+              variables={variables}
+            />
+          </section>
+
+          <div
+            aria-label="Resize Context and Result"
+            aria-orientation="horizontal"
+            className="feel-playground__resize-handle"
+            role="separator"
+            tabIndex={0}
+            onKeyDown={handleResizeKeyDown}
+            onPointerDown={handleResizeStart}
+            onPointerMove={handleResize}
+            onPointerUp={handleResizeEnd}
+            onPointerCancel={handleResizeEnd}
+          />
+
+          <div className="feel-playground__evaluation" ref={evaluationRef}>
+            <ContextEditor
+              value={context}
+              onChange={onContextChange}
+              onReset={resolveContext ? handleContextReset : undefined}
+              error={state.status === 'invalid-context' ? state.error : undefined}
+            />
+            <ResultView
+              state={state}
+              expression={expression}
+              expressionErrors={expressionErrors}
+              onSelectExpressionError={position => expressionEditorRef.current?.focus(position)}
+            />
+          </div>
         </div>
-        <ExpressionEditor
-          ref={expressionEditorRef}
-          value={expression}
-          onChange={handleExpressionChange}
-          onValidityChange={setExpressionValid}
-          onErrorsChange={setExpressionErrors}
-          dialect={dialect}
-          variables={variables}
-        />
-      </section>
-
-      <div
-        aria-label="Resize Context and Result"
-        aria-orientation="horizontal"
-        className="feel-playground__resize-handle"
-        role="separator"
-        tabIndex={0}
-        onKeyDown={handleResizeKeyDown}
-        onPointerDown={handleResizeStart}
-        onPointerMove={handleResize}
-        onPointerUp={handleResizeEnd}
-        onPointerCancel={handleResizeEnd}
-      />
-
-      <div className="feel-playground__evaluation" ref={evaluationRef}>
-        <ContextEditor
-          value={context}
-          onChange={onContextChange}
-          onReset={resolveContext ? handleContextReset : undefined}
-          error={state.status === 'invalid-context' ? state.error : undefined}
-        />
-        <ResultView
-          state={state}
-          expression={expression}
-          expressionErrors={expressionErrors}
-          onSelectExpressionError={position => expressionEditorRef.current?.focus(position)}
-        />
-      </div>
-    </div>
+      </TooltipProvider>
+    </C4Provider>
   );
 }
 

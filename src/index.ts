@@ -1,3 +1,4 @@
+import '@camunda/design-system/styles.css';
 import './render/styles.css';
 
 export { FeelPlayground } from './render';
