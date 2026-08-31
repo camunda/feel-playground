@@ -1,5 +1,5 @@
 declare module '@bpmn-io/feel-editor' {
-  import type { FeelDialect } from './core';
+  import type { FeelDialect } from './core/types';
   import type { FeelLintReport, FeelVariable } from './render/ExpressionEditor';
 
   interface FeelEditorConfig {

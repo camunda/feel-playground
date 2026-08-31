@@ -8,7 +8,7 @@ import {
 import FeelEditor from '@bpmn-io/feel-editor';
 import { lineNumbers } from '@codemirror/view';
 
-import type { FeelDialect } from '../core';
+import type { FeelDialect } from '../core/types';
 import type { PlaygroundDiagnostic } from './DiagnosticList';
 import { createErrorLineNumbers } from './errorLineNumbers';
 

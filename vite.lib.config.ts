@@ -9,13 +9,11 @@ export default defineConfig({
     emptyOutDir: true,
     lib: {
       cssFileName: 'style',
-      entry: {
-        index: resolve('src/index.ts'),
-        core: resolve('src/core/index.ts')
-      },
+      entry: resolve('src/index.ts'),
+      fileName: 'index',
       formats: [ 'es' ]
     },
-    outDir: 'dist/lib',
+    outDir: 'dist',
     rollupOptions: {
       external: [
         '@bpmn-io/cm-theme',
@@ -36,7 +34,8 @@ export default defineConfig({
     react(),
     dts({
       include: [ 'src' ],
-      outDir: 'dist/lib'
+      outDir: 'dist',
+      rollupTypes: true
     })
   ]
 });

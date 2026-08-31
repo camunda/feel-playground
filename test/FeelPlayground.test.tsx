@@ -18,7 +18,7 @@ import {
   vi
 } from 'vitest';
 
-import type { Evaluate } from '../src/core';
+import type { Evaluate } from '../src/core/types';
 import { FeelPlayground } from '../src/render/FeelPlayground';
 
 const feelEditor = vi.hoisted(() => ({

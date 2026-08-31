@@ -13,6 +13,5 @@ export type {
   EvaluationInput,
   EvaluationResult,
   EvaluationWarning,
-  FeelDialect,
-  PlaygroundState
-} from './core';
+  FeelDialect
+} from './core/types';

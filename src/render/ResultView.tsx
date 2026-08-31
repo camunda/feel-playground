@@ -1,7 +1,7 @@
 import type {
   EvaluationWarning,
   PlaygroundState
-} from '../core';
+} from '../core/types';
 import {
   DiagnosticList,
   type PlaygroundDiagnostic
