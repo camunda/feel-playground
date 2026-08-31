@@ -2,7 +2,8 @@ import { useState } from 'react';
 
 import {
   FeelPlayground,
-  type Evaluate
+  type Evaluate,
+  type EvaluationContext
 } from '../src';
 import { evaluateOnConfiguredCluster } from './evaluate';
 
@@ -37,6 +38,19 @@ const ERROR_CONTEXT = `{
     "User-Agent": "order-service/2.4"
   }
 }`;
+
+const ERROR_RESOLVED_CONTEXT = {
+  base: 'api.example.com',
+  protocol: 443,
+  request: {
+    id: 'req-8472',
+    environment: 'production'
+  },
+  headers: {
+    Accept: 'application/json',
+    'User-Agent': 'order-service/2.4'
+  }
+};
 
 type Preview =
   | 'live'
@@ -128,6 +142,7 @@ export function App() {
           onExpressionChange={setExpression}
           context={context}
           onContextChange={setContext}
+          resolveContext={() => Promise.resolve(getPreviewContext(preview))}
           dialect="expression"
           evaluationUnavailable={evaluationUnavailable}
           onEvaluate={onEvaluate}
@@ -149,6 +164,17 @@ function getPreviewValues(preview: Preview) {
       return { expression: INITIAL_EXPRESSION, context: WARNING_CONTEXT };
     default:
       return { expression: INITIAL_EXPRESSION, context: INITIAL_CONTEXT };
+  }
+}
+
+function getPreviewContext(preview: Preview): EvaluationContext {
+  switch (preview) {
+    case 'context-error':
+      return ERROR_RESOLVED_CONTEXT;
+    case 'warning':
+      return JSON.parse(WARNING_CONTEXT);
+    default:
+      return JSON.parse(INITIAL_CONTEXT);
   }
 }
 
