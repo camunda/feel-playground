@@ -1,5 +1,7 @@
 # @camunda/feel-playground
 
+[![CI](https://github.com/camunda/feel-playground/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/camunda/feel-playground/actions/workflows/CI.yml)
+
 A controlled React component for editing and remotely evaluating FEEL expressions with a JSON context.
 
 The package owns the expression editor, context editor, and result presentation. The host owns expression and context state and provides the evaluation function.
