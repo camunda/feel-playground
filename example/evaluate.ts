@@ -30,7 +30,11 @@ export const evaluateOnConfiguredCluster: Evaluate = async (input, { signal }) =
 };
 
 function isEvaluationResult(value: unknown): value is EvaluationResult {
-  return value !== null && typeof value === 'object' && 'result' in value;
+  return value !== null
+    && typeof value === 'object'
+    && 'result' in value
+    && 'warnings' in value
+    && Array.isArray(value.warnings);
 }
 
 function getErrorMessage(value: unknown): string | undefined {

@@ -188,7 +188,7 @@ async function evaluateOnCluster(config: ClusterConfig, input: EvaluationInput):
 
   return {
     result: body.result,
-    warnings: body.warnings || []
+    warnings: body.warnings ?? []
   };
 }
 

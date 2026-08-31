@@ -1,5 +1,4 @@
 export { createPlaygroundController } from './createPlaygroundController';
-export { normalizeEvaluationResult } from './evaluation';
 export { parseContext } from './parseContext';
 
 export type {

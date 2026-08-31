@@ -64,7 +64,8 @@ const PREVIEWS: Array<{ id: Preview; label: string }> = [
 const SUCCESS_EVALUATOR: Evaluate = async () => ({
   result: {
     url: 'https://google.com:8080'
-  }
+  },
+  warnings: []
 });
 
 const ERROR_EVALUATOR: Evaluate = async () => {
@@ -76,7 +77,7 @@ const LOADING_EVALUATOR: Evaluate = async (_, { signal }) => {
     signal.addEventListener('abort', () => reject(signal.reason), { once: true });
   });
 
-  return { result: null };
+  return { result: null, warnings: [] };
 };
 
 export function App() {

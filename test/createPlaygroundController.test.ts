@@ -104,7 +104,7 @@ describe('createPlaygroundController', () => {
 
   it('should accept an empty context as an object', async () => {
     // given
-    const onEvaluate = vi.fn().mockResolvedValue({ result: 2 });
+    const onEvaluate = vi.fn().mockResolvedValue({ result: 2, warnings: [] });
     const controller = createPlaygroundController({ debounce: 0 });
 
     // when
@@ -181,7 +181,7 @@ describe('createPlaygroundController', () => {
 
   it('should show a result returned by the host', async () => {
     // given
-    const onEvaluate = vi.fn().mockResolvedValue({ result: { total: 2 } });
+    const onEvaluate = vi.fn().mockResolvedValue({ result: { total: 2 }, warnings: [] });
     const controller = createPlaygroundController({ debounce: 0 });
 
     // when
@@ -248,20 +248,4 @@ describe('createPlaygroundController', () => {
     });
   });
 
-
-  it('should show an error for an invalid host response', async () => {
-    // given
-    const onEvaluate = vi.fn().mockResolvedValue({});
-    const controller = createPlaygroundController({ debounce: 0 });
-
-    // when
-    controller.update({ ...VALID_INPUT, onEvaluate });
-    await vi.runAllTimersAsync();
-
-    // then
-    expect(controller.getState()).toEqual({
-      status: 'error',
-      error: 'Evaluator must resolve to an object containing result.'
-    });
-  });
 });

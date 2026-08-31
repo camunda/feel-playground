@@ -1,4 +1,3 @@
-import { normalizeEvaluationResult } from './evaluation';
 import { parseContext } from './parseContext';
 import type {
   PlaygroundController,
@@ -109,7 +108,7 @@ export function createPlaygroundController(
     setState({ status: 'loading' });
 
     try {
-      const value = await evaluate(
+      const result = await evaluate(
         { expression, context, dialect: input.dialect },
         { signal: controller.signal }
       );
@@ -117,8 +116,6 @@ export function createPlaygroundController(
       if (controller.signal.aborted || scheduledRevision !== revision) {
         return;
       }
-
-      const result = normalizeEvaluationResult(value);
 
       setState(result.warnings.length
         ? { status: 'warning', result: result.result, warnings: result.warnings }

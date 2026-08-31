@@ -136,7 +136,7 @@ describe('<FeelPlayground>', () => {
 
   it('should wait for lint before evaluating a changed expression', async () => {
     // given
-    const onEvaluate = vi.fn().mockResolvedValue({ result: 2 });
+    const onEvaluate = vi.fn().mockResolvedValue({ result: 2, warnings: [] });
 
     renderPlayground({ onEvaluate });
     act(() => feelEditor.onLint?.([]));
@@ -156,7 +156,7 @@ describe('<FeelPlayground>', () => {
   it('should evaluate when the host becomes available', async () => {
 
     // given
-    const onEvaluate = vi.fn<Evaluate>().mockResolvedValue({ result: 2 });
+    const onEvaluate = vi.fn<Evaluate>().mockResolvedValue({ result: 2, warnings: [] });
     const { rerender } = render(createPlayground({
       context: '{}',
       evaluationUnavailable: 'No cluster connection.'

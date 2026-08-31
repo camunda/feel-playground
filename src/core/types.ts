@@ -19,7 +19,7 @@ export interface EvaluationInput {
 
 export interface EvaluationResult {
   result: unknown;
-  warnings?: EvaluationWarning[];
+  warnings: EvaluationWarning[];
 }
 
 export type Evaluate = (
