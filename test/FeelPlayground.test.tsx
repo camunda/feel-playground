@@ -30,7 +30,8 @@ const feelEditor = vi.hoisted(() => ({
     severity: 'error' | 'warning';
     to: number;
     type?: string;
-  }>) => void) | undefined
+  }>) => void) | undefined,
+  setVariables: vi.fn()
 }));
 
 vi.mock('@bpmn-io/feel-editor', () => ({
@@ -57,7 +58,9 @@ vi.mock('@bpmn-io/feel-editor', () => ({
 
     setValue() { }
 
-    setVariables() { }
+    setVariables(variables: unknown[]) {
+      feelEditor.setVariables(variables);
+    }
 
     focus(position: number) {
       feelEditor.focus(position);
@@ -69,6 +72,7 @@ afterEach(() => {
   feelEditor.onChange = undefined;
   feelEditor.onLint = undefined;
   feelEditor.focus.mockReset();
+  feelEditor.setVariables.mockReset();
   cleanup();
 });
 
@@ -153,6 +157,21 @@ describe('<FeelPlayground>', () => {
     expect(await screen.findByText('Checking your FEEL expression before evaluation…')).toBeTruthy();
     expect(onEvaluate).not.toHaveBeenCalled();
     expect(screen.queryByText('2')).toBeNull();
+  });
+
+
+  it('should preserve editor configuration through lint and evaluation updates', async () => {
+    // given
+    const onEvaluate = vi.fn().mockResolvedValue({ result: 2, warnings: [] });
+    renderPlayground({ onEvaluate });
+
+    // when
+    act(() => feelEditor.onLint?.([]));
+
+    // then
+    await waitFor(() => expect(onEvaluate).toHaveBeenCalledOnce());
+    expect(await screen.findByText('2')).toBeTruthy();
+    expect(feelEditor.setVariables).toHaveBeenCalledOnce();
   });
 
 
