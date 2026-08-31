@@ -12,7 +12,6 @@ import { setDiagnostics, type Diagnostic } from '@codemirror/lint';
 import { Compartment, EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { basicSetup } from 'codemirror';
-import { RotateCcw } from 'lucide-react';
 
 import { DiagnosticList } from './DiagnosticList';
 import { StatusIcon } from './StatusIcon';
@@ -145,7 +144,18 @@ export function ContextEditor({ value, onChange, onReset, error }: ContextEditor
                   variant="ghost"
                   onClick={onReset}
                 >
-                  <RotateCcw aria-hidden="true" />
+                  <svg
+                    aria-hidden="true"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M3 12a9 9 0 1 0 3-7.7L3 7" />
+                    <path d="M3 3v4h4" />
+                  </svg>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Reset to prefilled context</TooltipContent>

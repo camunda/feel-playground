@@ -26,7 +26,6 @@ export default defineConfig({
         '@codemirror/state',
         '@codemirror/view',
         'codemirror',
-        'lucide-react',
         'react',
         'react-dom/client',
         'react/jsx-runtime'
