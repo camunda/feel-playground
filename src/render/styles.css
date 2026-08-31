@@ -81,6 +81,42 @@
   font-family: var(--feel-playground-monospace-font-family, "IBM Plex Mono", "SFMono-Regular", Consolas, monospace);
 }
 
+.feel-playground__section-heading-actions {
+  display: flex;
+  align-self: stretch;
+  align-items: center;
+  gap: 8px;
+}
+
+.feel-playground__icon-button {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  color: var(--feel-playground-muted-text-color, #525252);
+  background: transparent;
+  cursor: pointer;
+}
+
+.feel-playground__icon-button:hover {
+  background: var(--feel-playground-button-hover-background-color, #e8e8e8);
+}
+
+.feel-playground__icon-button:focus-visible {
+  outline: 2px solid var(--feel-playground-link-color, #0f62fe);
+  outline-offset: -2px;
+}
+
+.feel-playground__icon-button svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
 .feel-playground__section-heading h3 {
   font-size: 14px;
   font-weight: 500;

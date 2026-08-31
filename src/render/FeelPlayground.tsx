@@ -9,6 +9,7 @@ import {
 import {
   createPlaygroundController,
   type Evaluate,
+  type EvaluationContext,
   type FeelDialect,
   type PlaygroundController,
   type PlaygroundState
@@ -37,6 +38,7 @@ export interface FeelPlaygroundProps {
   onExpressionChange(expression: string): void;
   context: string;
   onContextChange(context: string): void;
+  resolveContext?(): Promise<EvaluationContext>;
   dialect: FeelDialect;
   variables?: FeelVariable[];
   onEvaluate?: Evaluate;
@@ -48,6 +50,7 @@ export function FeelPlayground({
   onExpressionChange,
   context,
   onContextChange,
+  resolveContext,
   dialect,
   variables = [],
   onEvaluate,
@@ -72,6 +75,20 @@ export function FeelPlayground({
     setExpressionValid(null);
     setExpressionErrors([]);
     onExpressionChange(nextExpression);
+  };
+
+  const handleContextReset = async () => {
+    if (!resolveContext) {
+      return;
+    }
+
+    try {
+      const resolvedContext = await resolveContext();
+
+      onContextChange(JSON.stringify(resolvedContext, null, 2));
+    } catch {
+      // Keep the current context when best-effort resolution fails.
+    }
   };
 
   useEffect(() => {
@@ -232,6 +249,7 @@ export function FeelPlayground({
         <ContextEditor
           value={context}
           onChange={onContextChange}
+          onReset={resolveContext ? handleContextReset : undefined}
           error={state.status === 'invalid-context' ? state.error : undefined}
         />
         <ResultView

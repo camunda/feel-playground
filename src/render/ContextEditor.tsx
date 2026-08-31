@@ -13,10 +13,11 @@ import { StatusIcon } from './StatusIcon';
 interface ContextEditorProps {
   value: string;
   onChange(value: string): void;
+  onReset?(): void;
   error?: string;
 }
 
-export function ContextEditor({ value, onChange, error }: ContextEditorProps) {
+export function ContextEditor({ value, onChange, onReset, error }: ContextEditorProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
   const valueRef = useRef(value);
@@ -127,12 +128,25 @@ export function ContextEditor({ value, onChange, error }: ContextEditorProps) {
     <section className="feel-playground__section feel-playground__context">
       <div className="feel-playground__section-heading">
         <h3>Context</h3>
-        {error && (
-          <span className="feel-playground__error-count">
-            <StatusIcon status="error" />
-            1
-          </span>
-        )}
+        <div className="feel-playground__section-heading-actions">
+          {onReset && (
+            <button
+              aria-label="Reload context"
+              className="feel-playground__icon-button"
+              title="Reload context"
+              type="button"
+              onClick={onReset}
+            >
+              <ResetIcon />
+            </button>
+          )}
+          {error && (
+            <span className="feel-playground__error-count">
+              <StatusIcon status="error" />
+              1
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="feel-playground__context-body">
@@ -152,6 +166,14 @@ export function ContextEditor({ value, onChange, error }: ContextEditorProps) {
         Add input variables as a JSON object.
       </p>
     </section>
+  );
+}
+
+function ResetIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 32 32">
+      <path d="M18,28A12,12,0,1,0,6,16v6.2L2.4,18.6,1,20l6,6,6-6-1.4-1.4L8,22.2V16H8A10,10,0,1,1,18,26Z" />
+    </svg>
   );
 }
 

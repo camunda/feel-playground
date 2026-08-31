@@ -1,4 +1,7 @@
 import {
+  useState
+} from 'react';
+import {
   act,
   cleanup,
   fireEvent,
@@ -235,6 +238,44 @@ describe('<FeelPlayground>', () => {
   });
 
 
+  it('should reload context and evaluate again', async () => {
+    // given
+    const onEvaluate = vi.fn<Evaluate>().mockResolvedValue({ result: 2, warnings: [] });
+    const resolveContext = vi.fn().mockResolvedValue({ customer: null });
+    function Playground() {
+      const [context, setContext] = useState('{ "customer": 42 }');
+
+      return createPlayground({
+        context,
+        onContextChange: setContext,
+        onEvaluate,
+        resolveContext
+      });
+    }
+
+    render(<Playground />);
+    act(() => feelEditor.onLint?.([]));
+    await waitFor(() => expect(onEvaluate).toHaveBeenCalledOnce());
+    onEvaluate.mockClear();
+
+    // when
+    fireEvent.click(screen.getByRole('button', { name: 'Reload context' }));
+
+    // then
+    await waitFor(() => {
+      expect(resolveContext).toHaveBeenCalledOnce();
+      expect(onEvaluate).toHaveBeenCalledWith(
+        {
+          context: { customer: null },
+          dialect: 'expression',
+          expression: '1 + 1'
+        },
+        expect.anything()
+      );
+    });
+  });
+
+
   it('should show a context error for malformed JSON', async () => {
     // when
     renderPlayground({ context: '{' });
@@ -242,8 +283,12 @@ describe('<FeelPlayground>', () => {
     // then
     const context = screen.getByRole('heading', { name: 'Context' }).closest('section')!;
     const result = screen.getByRole('heading', { name: 'Result' }).closest('section')!;
+    const contextHeading = within(context).getByRole('heading', { name: 'Context' }).parentElement!;
+    const resetButton = within(contextHeading).getByRole('button', { name: 'Reload context' });
+    const errorIcon = within(contextHeading).getByRole('img', { name: 'Error' });
 
     expect(await within(context).findAllByRole('img', { name: 'Error' })).toHaveLength(2);
+    expect(resetButton.compareDocumentPosition(errorIcon) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(within(context).getByRole('button', { name: /Context error/ })).toBeTruthy();
     expect(within(context).queryByText(/at position \d+/)).toBeNull();
     expect(within(result).queryByRole('img', { name: 'Error' })).toBeNull();
@@ -303,13 +348,23 @@ describe('<FeelPlayground>', () => {
 function renderPlayground({
   context = '{}',
   evaluationUnavailable,
-  onEvaluate = vi.fn<Evaluate>().mockResolvedValue({ result: 2 })
+  onEvaluate = vi.fn<Evaluate>().mockResolvedValue({ result: 2, warnings: [] }),
+  onContextChange = () => { },
+  resolveContext
 }: {
   context?: string;
   evaluationUnavailable?: string;
   onEvaluate?: Evaluate;
+  onContextChange?: (context: string) => void;
+  resolveContext?: () => Promise<Record<string, unknown>>;
 } = {}) {
-  return render(createPlayground({ context, evaluationUnavailable, onEvaluate }));
+  return render(createPlayground({
+    context,
+    evaluationUnavailable,
+    onEvaluate,
+    onContextChange,
+    resolveContext
+  }));
 }
 
 function rerenderPlayground(
@@ -326,18 +381,23 @@ function rerenderPlayground(
 function createPlayground({
   context,
   evaluationUnavailable,
-  onEvaluate
+  onEvaluate,
+  onContextChange = () => { },
+  resolveContext = async () => ({})
 }: {
   context: string;
   evaluationUnavailable?: string;
   onEvaluate?: Evaluate;
+  onContextChange?: (context: string) => void;
+  resolveContext?: () => Promise<Record<string, unknown>>;
 }) {
   return (
     <FeelPlayground
       expression="1 + 1"
       onExpressionChange={() => { }}
       context={context}
-      onContextChange={() => { }}
+      onContextChange={onContextChange}
+      resolveContext={resolveContext}
       dialect="expression"
       evaluationUnavailable={evaluationUnavailable}
       onEvaluate={onEvaluate}
