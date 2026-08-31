@@ -12,13 +12,13 @@ import {
 } from '@camunda/design-system';
 
 import {
-  createPlaygroundController,
   type Evaluate,
   type EvaluationContext,
   type FeelDialect,
   type PlaygroundController,
   type PlaygroundState
-} from '../core';
+} from '../core/types';
+import { createPlaygroundController } from '../core/createPlaygroundController';
 import { ContextEditor } from './ContextEditor';
 import {
   ExpressionEditor,

@@ -11,7 +11,7 @@ import {
   it
 } from 'vitest';
 
-import type { PlaygroundState } from '../src/core';
+import type { PlaygroundState } from '../src/core/types';
 import { ResultView } from '../src/render/ResultView';
 
 afterEach(cleanup);

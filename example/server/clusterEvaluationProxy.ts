@@ -11,7 +11,7 @@ import type {
   EvaluationInput,
   EvaluationResult,
   EvaluationWarning
-} from '../../src/core';
+} from '../../src/core/types';
 
 const CONFIG_PATH = resolve('cluster.config.json');
 const MAX_REQUEST_SIZE = 1024 * 1024;
