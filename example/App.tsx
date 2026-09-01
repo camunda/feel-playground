@@ -198,7 +198,7 @@ function getPreviewConfig(preview: Preview): {
 } {
   switch (preview) {
   case 'unavailable':
-    return { evaluationUnavailable: 'No Camunda 8 cluster connection.' };
+    return { evaluationUnavailable: 'No Camunda connection.' };
   case 'loading':
     return { onEvaluate: LOADING_EVALUATOR };
   case 'success':

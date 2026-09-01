@@ -124,13 +124,13 @@ describe('<FeelPlayground>', () => {
 
     // given
     renderPlayground();
-    act(() => feelEditor.onLint?.([ {
+    act(() => feelEditor.onLint?.([{
       from: 2,
       message: 'The operator needs a right-hand value.',
       severity: 'error',
       to: 3,
       type: 'Syntax Error'
-    } ]));
+    }]));
 
     // when
     act(() => feelEditor.onLint?.([]));
@@ -157,7 +157,7 @@ describe('<FeelPlayground>', () => {
     act(() => feelEditor.onChange?.('1 +'));
 
     // then
-    expect(await screen.findByText('Checking your FEEL expression before evaluation…')).toBeTruthy();
+    expect(await screen.findByText('Evaluating…')).toBeTruthy();
     expect(onEvaluate).not.toHaveBeenCalled();
     expect(screen.queryByText('2')).toBeNull();
   });
@@ -270,7 +270,7 @@ describe('<FeelPlayground>', () => {
     const onEvaluate = vi.fn<Evaluate>().mockResolvedValue({ result: 2, warnings: [] });
     const resolveContext = vi.fn().mockResolvedValue({ customer: null });
     function Playground() {
-      const [ context, setContext ] = useState('{ "customer": 42 }');
+      const [context, setContext] = useState('{ "customer": 42 }');
 
       return createPlayground({
         context,
@@ -404,13 +404,13 @@ describe('<FeelPlayground>', () => {
     renderPlayground({ context: '{' });
 
     // when
-    act(() => feelEditor.onLint?.([ {
+    act(() => feelEditor.onLint?.([{
       from: 2,
       message: 'The operator needs a right-hand value.',
       severity: 'error',
       to: 3,
       type: 'Syntax Error'
-    } ]));
+    }]));
 
     // then
     const expression = screen.getByRole('heading', { name: 'FEEL expression' }).closest('section')!;
@@ -453,8 +453,8 @@ function renderPlayground({
 }
 
 function rerenderPlayground(
-    rerender: ReturnType<typeof render>['rerender'],
-    props: {
+  rerender: ReturnType<typeof render>['rerender'],
+  props: {
     context?: string;
     evaluationUnavailable?: string;
     onEvaluate?: Evaluate;
@@ -479,13 +479,13 @@ function createPlayground({
   return (
     <FeelPlayground
       expression="1 + 1"
-      onExpressionChange={ () => { } }
-      context={ context }
-      onContextChange={ onContextChange }
-      resolveContext={ resolveContext }
+      onExpressionChange={() => { }}
+      context={context}
+      onContextChange={onContextChange}
+      resolveContext={resolveContext}
       dialect="expression"
-      evaluationUnavailable={ evaluationUnavailable }
-      onEvaluate={ onEvaluate }
+      evaluationUnavailable={evaluationUnavailable}
+      onEvaluate={onEvaluate}
     />
   );
 }

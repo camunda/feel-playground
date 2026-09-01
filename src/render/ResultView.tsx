@@ -58,7 +58,7 @@ function Result({ state, expressionErrors = [] }: ResultViewProps) {
   case 'idle':
     return <p>Enter an expression to evaluate.</p>;
   case 'validating-expression':
-    return <p>Checking your FEEL expression before evaluation…</p>;
+    return <p>Evaluating…</p>;
   case 'invalid-expression':
     return <p>Fix the errors in your FEEL expression to evaluate it.</p>;
   case 'invalid-context':
@@ -67,7 +67,7 @@ function Result({ state, expressionErrors = [] }: ResultViewProps) {
       : <p>Fix the errors in your context to evaluate the expression.</p>;
   case 'scheduled':
   case 'loading':
-    return <p>Evaluating on the configured cluster…</p>;
+    return <p>Evaluating…</p>;
   case 'unavailable':
     return <p>{state.message}</p>;
   case 'error':
@@ -81,10 +81,10 @@ function Result({ state, expressionErrors = [] }: ResultViewProps) {
 function Status({ status }: { status: PlaygroundState['status'] }) {
   switch (status) {
   case 'idle':
-  case 'validating-expression':
   case 'invalid-expression':
   case 'invalid-context':
     return null;
+  case 'validating-expression':
   case 'scheduled':
   case 'loading':
     return <StatusIcon status="loading" />;
