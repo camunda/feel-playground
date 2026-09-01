@@ -19,6 +19,7 @@ export default defineConfig({
         '@bpmn-io/cm-theme',
         '@bpmn-io/feel-editor',
         '@camunda/design-system',
+        '@codemirror/autocomplete',
         '@codemirror/lang-json',
         '@codemirror/lint',
         '@codemirror/state',

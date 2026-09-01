@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useImperativeHandle, useRef, type Ref } from 'react';
 
 import { feelLight } from '@bpmn-io/cm-theme';
 import {
@@ -7,6 +7,7 @@ import {
   TooltipContent,
   TooltipTrigger
 } from '@camunda/design-system';
+import { snippet } from '@codemirror/autocomplete';
 import { json } from '@codemirror/lang-json';
 import { setDiagnostics, type Diagnostic } from '@codemirror/lint';
 import { Compartment, EditorState } from '@codemirror/state';
@@ -16,14 +17,23 @@ import { basicSetup } from 'codemirror';
 import { DiagnosticList } from './DiagnosticList';
 import { StatusIcon } from './StatusIcon';
 
+export interface ContextEditorHandle {
+
+  /**
+   * Replace the context with a snippet template, activating its tab stops.
+   */
+  insertTemplate(template: string, options?: { focus?: boolean }): void;
+}
+
 interface ContextEditorProps {
   value: string;
   onChange(value: string): void;
   onReset?(): void;
   error?: string;
+  ref?: Ref<ContextEditorHandle>;
 }
 
-export function ContextEditor({ value, onChange, onReset, error }: ContextEditorProps) {
+export function ContextEditor({ value, onChange, onReset, error, ref }: ContextEditorProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
   const valueRef = useRef(value);
@@ -74,6 +84,24 @@ export function ContextEditor({ value, onChange, onReset, error }: ContextEditor
       editor.destroy();
     };
   }, []);
+
+  useImperativeHandle(ref, () => ({
+    insertTemplate(template, options = {}) {
+      const editor = editorRef.current;
+
+      if (!editor) {
+        return;
+      }
+
+      // the update listener syncs valueRef and notifies the host, so the
+      // value effect below will not overwrite the snippet
+      snippet(template)(editor, null, 0, editor.state.doc.length);
+
+      if (options.focus) {
+        editor.focus();
+      }
+    }
+  }), []);
 
   useEffect(() => {
     const editor = editorRef.current;

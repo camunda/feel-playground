@@ -19,7 +19,8 @@ import {
   type PlaygroundState
 } from '../core/types';
 import { createPlaygroundController } from '../core/createPlaygroundController';
-import { ContextEditor } from './ContextEditor';
+import { toSnippetTemplate } from '../core/snippetTemplate';
+import { ContextEditor, type ContextEditorHandle } from './ContextEditor';
 import {
   ExpressionEditor,
   type ExpressionEditorHandle,
@@ -38,6 +39,9 @@ const EMPTY_VARIABLES: FeelVariable[] = [];
 /**
  * Controlled FEEL playground. The host owns expression and context persistence
  * and injects the evaluator implementation.
+ *
+ * When `resolveContext` is given and the context is still empty, it is used to
+ * prefill the context as a snippet, so the user can tab through the values.
  */
 export interface FeelPlaygroundProps {
   expression: string;
@@ -63,6 +67,7 @@ export function FeelPlayground({
   evaluationUnavailable
 }: FeelPlaygroundProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const contextEditorRef = useRef<ContextEditorHandle | null>(null);
   const controllerRef = useRef<PlaygroundController | null>(null);
   const evaluationRef = useRef<HTMLDivElement | null>(null);
   const expressionEditorRef = useRef<ExpressionEditorHandle | null>(null);
@@ -83,7 +88,7 @@ export function FeelPlayground({
     onExpressionChange(nextExpression);
   };
 
-  const handleContextReset = async () => {
+  const fillContext = async (options: { focus?: boolean } = {}) => {
     if (!resolveContext) {
       return;
     }
@@ -91,11 +96,22 @@ export function FeelPlayground({
     try {
       const resolvedContext = await resolveContext();
 
-      onContextChange(JSON.stringify(resolvedContext, null, 2));
+      contextEditorRef.current?.insertTemplate(toSnippetTemplate(resolvedContext), options);
     } catch {
       // Keep the current context when best-effort resolution fails.
     }
   };
+
+  const handleContextReset = () => fillContext({ focus: true });
+
+  // prefill on open, leaving a context the host restored untouched
+  useEffect(() => {
+    if (!isEmptyContext(context)) {
+      return;
+    }
+
+    fillContext();
+  }, []);
 
   useEffect(() => {
     const controller = createPlaygroundController({ debounce: EVALUATION_DEBOUNCE });
@@ -255,6 +271,7 @@ export function FeelPlayground({
 
           <div className="feel-playground__evaluation" ref={evaluationRef}>
             <ContextEditor
+              ref={contextEditorRef}
               value={context}
               onChange={onContextChange}
               onReset={resolveContext ? handleContextReset : undefined}
@@ -271,6 +288,12 @@ export function FeelPlayground({
       </TooltipProvider>
     </C4Provider>
   );
+}
+
+function isEmptyContext(context: string) {
+  const trimmed = context.trim();
+
+  return !trimmed || trimmed === '{}';
 }
 
 function getCollapsedEvaluationHeight(evaluation: HTMLDivElement | null) {

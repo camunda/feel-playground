@@ -22,6 +22,13 @@ const INITIAL_CONTEXT = `{
   "protocol": 8080
 }`;
 
+// null leaves become tab stops, so the live preview opens with both variables
+// prefilled as placeholders to tab through and fill in
+const LIVE_RESOLVED_CONTEXT = {
+  base: null,
+  protocol: null
+};
+
 const WARNING_CONTEXT = `{
   "base": "google.com"
 }`;
@@ -95,9 +102,9 @@ const LOADING_EVALUATOR: Evaluate = async (_, { signal }) => {
 };
 
 export function App() {
-  const [expression, setExpression] = useState(INITIAL_EXPRESSION);
-  const [context, setContext] = useState(INITIAL_CONTEXT);
   const [preview, setPreview] = useState<Preview>('live');
+  const [expression, setExpression] = useState(() => getPreviewValues('live').expression);
+  const [context, setContext] = useState(() => getPreviewValues('live').context);
 
   const selectPreview = (nextPreview: Preview) => {
     const nextValues = getPreviewValues(nextPreview);
@@ -138,6 +145,9 @@ export function App() {
 
       <div className="app-playground-window">
         <FeelPlayground
+
+          // each preview is its own scenario, so remount to prefill again
+          key={preview}
           expression={expression}
           onExpressionChange={setExpression}
           context={context}
@@ -154,6 +164,8 @@ export function App() {
 
 function getPreviewValues(preview: Preview) {
   switch (preview) {
+    case 'live':
+      return { expression: INITIAL_EXPRESSION, context: '' };
     case 'empty':
       return { expression: '', context: INITIAL_CONTEXT };
     case 'expression-error':
@@ -169,6 +181,8 @@ function getPreviewValues(preview: Preview) {
 
 function getPreviewContext(preview: Preview): EvaluationContext {
   switch (preview) {
+    case 'live':
+      return LIVE_RESOLVED_CONTEXT;
     case 'context-error':
       return ERROR_RESOLVED_CONTEXT;
     case 'warning':

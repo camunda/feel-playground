@@ -295,6 +295,48 @@ describe('<FeelPlayground>', () => {
   });
 
 
+  it('should prefill the context on open', async () => {
+    // given
+    const resolveContext = vi.fn().mockResolvedValue({ customer: { id: null } });
+
+    // when
+    renderPlayground({ resolveContext });
+
+    // then
+    await waitFor(() => {
+      expect(getContext()).to.eql({ customer: { id: null } });
+    });
+  });
+
+
+  it('should prefill the context with one tab stop per variable', async () => {
+    // given
+    const resolveContext = vi.fn().mockResolvedValue({ base: null, protocol: null });
+
+    // when
+    renderPlayground({ context: '', resolveContext });
+
+    // then
+    await waitFor(() => {
+      expect(document.querySelectorAll('.cm-snippetField')).toHaveLength(2);
+    });
+    expect(getContext()).to.eql({ base: null, protocol: null });
+  });
+
+
+  it('should keep a context restored by the host', async () => {
+    // given
+    const resolveContext = vi.fn().mockResolvedValue({ customer: null });
+
+    // when
+    renderPlayground({ context: '{ "custom": true }', resolveContext });
+
+    // then
+    await waitFor(() => expect(resolveContext).not.toHaveBeenCalled());
+    expect(getContext()).to.eql({ custom: true });
+  });
+
+
   it('should show a context error for malformed JSON', async () => {
     // when
     renderPlayground({ context: '{' });
@@ -363,6 +405,13 @@ describe('<FeelPlayground>', () => {
     expect(within(result).getAllByRole('img', { name: 'Error' })).toHaveLength(1);
   });
 });
+
+function getContext() {
+  const editor = document.querySelector('.feel-playground__context-editor .cm-content');
+  const lines = Array.from(editor?.querySelectorAll('.cm-line') ?? []);
+
+  return JSON.parse(lines.map(line => line.textContent).join('\n'));
+}
 
 function renderPlayground({
   context = '{}',
