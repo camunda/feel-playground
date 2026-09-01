@@ -2,8 +2,7 @@ import { useState } from 'react';
 
 import {
   FeelPlayground,
-  type Evaluate,
-  type EvaluationContext
+  type Evaluate
 } from '../src';
 import { evaluateOnConfiguredCluster } from './evaluate';
 
@@ -24,10 +23,10 @@ const INITIAL_CONTEXT = `{
 
 // null leaves become tab stops, so the live preview opens with both variables
 // prefilled as placeholders to tab through and fill in
-const LIVE_RESOLVED_CONTEXT = {
-  base: null,
-  protocol: null
-};
+const VARIABLES = [
+  { name: 'base' },
+  { name: 'protocol' }
+];
 
 const WARNING_CONTEXT = `{
   "base": "google.com"
@@ -45,19 +44,6 @@ const ERROR_CONTEXT = `{
     "User-Agent": "order-service/2.4"
   }
 }`;
-
-const ERROR_RESOLVED_CONTEXT = {
-  base: 'api.example.com',
-  protocol: 443,
-  request: {
-    id: 'req-8472',
-    environment: 'production'
-  },
-  headers: {
-    Accept: 'application/json',
-    'User-Agent': 'order-service/2.4'
-  }
-};
 
 type Preview =
   | 'live'
@@ -152,8 +138,8 @@ export function App() {
           onExpressionChange={ setExpression }
           context={ context }
           onContextChange={ setContext }
-          resolveContext={ () => Promise.resolve(getPreviewContext(preview)) }
           dialect="expression"
+          variables={ VARIABLES }
           evaluationUnavailable={ evaluationUnavailable }
           onEvaluate={ onEvaluate }
         />
@@ -176,19 +162,6 @@ function getPreviewValues(preview: Preview) {
     return { expression: INITIAL_EXPRESSION, context: WARNING_CONTEXT };
   default:
     return { expression: INITIAL_EXPRESSION, context: INITIAL_CONTEXT };
-  }
-}
-
-function getPreviewContext(preview: Preview): EvaluationContext {
-  switch (preview) {
-  case 'live':
-    return LIVE_RESOLVED_CONTEXT;
-  case 'context-error':
-    return ERROR_RESOLVED_CONTEXT;
-  case 'warning':
-    return JSON.parse(WARNING_CONTEXT);
-  default:
-    return JSON.parse(INITIAL_CONTEXT);
   }
 }
 

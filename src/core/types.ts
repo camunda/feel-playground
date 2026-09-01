@@ -2,6 +2,20 @@ export type EvaluationContext = Record<string, unknown>;
 
 export type FeelDialect = 'expression' | 'unaryTests';
 
+export interface FeelBuiltin {
+  name: string;
+  type?: 'function';
+  params?: Array<{ name: string }>;
+  info?: string;
+}
+
+export interface FeelLanguageContext {
+  builtins?: FeelBuiltin[];
+  reservedNameBuiltins?: FeelBuiltin[];
+  dialect?: FeelDialect;
+  parserDialect?: 'camunda';
+}
+
 export interface EvaluationWarning {
   type?: string;
   message: string;

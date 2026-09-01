@@ -15,8 +15,7 @@ import { useState } from 'react';
 
 import {
 	FeelPlayground,
-	type Evaluate,
-	type EvaluationContext
+	type Evaluate
 } from '@camunda/feel-playground';
 import '@camunda/feel-playground/style.css';
 
@@ -35,23 +34,17 @@ const evaluate: Evaluate = async (input, { signal }) => {
 	return { result, warnings };
 };
 
-const resolveContext = async (): Promise<EvaluationContext> => {
-	const response = await fetch('/api/evaluation-context');
-
-	return response.json();
-};
-
 export function Playground() {
 	const [expression, setExpression] = useState('x + y');
-	const [context, setContext] = useState('{ "x": 10, "y": 20 }');
+	const [context, setContext] = useState('{}');
 
 	return <FeelPlayground
 		expression={expression}
 		onExpressionChange={setExpression}
 		context={context}
 		onContextChange={setContext}
-		resolveContext={resolveContext}
 		dialect="expression"
+		variables={[ { name: 'x' }, { name: 'y' } ]}
 		onEvaluate={evaluate}
 	/>;
 }
@@ -61,7 +54,7 @@ Evaluation is remote-only. Authentication, connectivity, and endpoint-specific r
 
 The package requires React 19. Its stylesheet includes the Camunda Design System tokens and component styles and defines the playground's appearance; hosts do not need to provide a design-system scope or playground theme variables.
 
-The context is a controlled, serialized JSON value. When `resolveContext` is provided, the playground shows a reload action that resolves a fresh context object, serializes it into the editor, and evaluates the expression again. Context resolution is best-effort; failures preserve the current context.
+The context is a controlled, serialized JSON value. When it is empty, the playground analyzes the expression and prefills the variables it references. The optional `variables` tree provides model-known structure for autocomplete and context generation; references missing from that tree are added with `null` values. The reload action restores this generated context without replacing a context restored by the host on open.
 
 When evaluation is temporarily unavailable, omit `onEvaluate` and explain why with `evaluationUnavailable`:
 

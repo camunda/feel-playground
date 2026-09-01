@@ -19,6 +19,7 @@ import {
 } from 'vitest';
 
 import type { Evaluate } from '../src/core/types';
+import type { FeelVariable } from '../src/render/ExpressionEditor';
 import { FeelPlayground } from '../src/render/FeelPlayground';
 
 const feelEditor = vi.hoisted(() => ({
@@ -124,13 +125,13 @@ describe('<FeelPlayground>', () => {
 
     // given
     renderPlayground();
-    act(() => feelEditor.onLint?.([{
+    act(() => feelEditor.onLint?.([ {
       from: 2,
       message: 'The operator needs a right-hand value.',
       severity: 'error',
       to: 3,
       type: 'Syntax Error'
-    }]));
+    } ]));
 
     // when
     act(() => feelEditor.onLint?.([]));
@@ -268,15 +269,15 @@ describe('<FeelPlayground>', () => {
 
     // given
     const onEvaluate = vi.fn<Evaluate>().mockResolvedValue({ result: 2, warnings: [] });
-    const resolveContext = vi.fn().mockResolvedValue({ customer: null });
     function Playground() {
-      const [context, setContext] = useState('{ "customer": 42 }');
+      const [ context, setContext ] = useState('{ "customer": 42 }');
 
       return createPlayground({
         context,
+        expression: 'customer',
         onContextChange: setContext,
         onEvaluate,
-        resolveContext
+        variables: [ { name: 'customer' } ]
       });
     }
 
@@ -290,12 +291,11 @@ describe('<FeelPlayground>', () => {
 
     // then
     await waitFor(() => {
-      expect(resolveContext).toHaveBeenCalledOnce();
       expect(onEvaluate).toHaveBeenCalledWith(
         {
           context: { customer: null },
           dialect: 'expression',
-          expression: '1 + 1'
+          expression: 'customer'
         },
         expect.anything()
       );
@@ -305,11 +305,11 @@ describe('<FeelPlayground>', () => {
 
   it('should prefill the context on open', async () => {
 
-    // given
-    const resolveContext = vi.fn().mockResolvedValue({ customer: { id: null } });
-
     // when
-    renderPlayground({ resolveContext });
+    renderPlayground({
+      expression: 'customer.id',
+      variables: [ { name: 'customer', entries: [ { name: 'id' } ] } ]
+    });
 
     // then
     await waitFor(() => {
@@ -320,11 +320,12 @@ describe('<FeelPlayground>', () => {
 
   it('should prefill the context with one tab stop per variable', async () => {
 
-    // given
-    const resolveContext = vi.fn().mockResolvedValue({ base: null, protocol: null });
-
     // when
-    renderPlayground({ context: '', resolveContext });
+    renderPlayground({
+      context: '',
+      expression: 'base + protocol',
+      variables: [ { name: 'base' }, { name: 'protocol' } ]
+    });
 
     // then
     await waitFor(() => {
@@ -336,14 +337,14 @@ describe('<FeelPlayground>', () => {
 
   it('should keep a context restored by the host', async () => {
 
-    // given
-    const resolveContext = vi.fn().mockResolvedValue({ customer: null });
-
     // when
-    renderPlayground({ context: '{ "custom": true }', resolveContext });
+    renderPlayground({
+      context: '{ "custom": true }',
+      expression: 'customer',
+      variables: [ { name: 'customer' } ]
+    });
 
     // then
-    await waitFor(() => expect(resolveContext).not.toHaveBeenCalled());
     expect(getContext()).to.eql({ custom: true });
   });
 
@@ -404,13 +405,13 @@ describe('<FeelPlayground>', () => {
     renderPlayground({ context: '{' });
 
     // when
-    act(() => feelEditor.onLint?.([{
+    act(() => feelEditor.onLint?.([ {
       from: 2,
       message: 'The operator needs a right-hand value.',
       severity: 'error',
       to: 3,
       type: 'Syntax Error'
-    }]));
+    } ]));
 
     // then
     const expression = screen.getByRole('heading', { name: 'FEEL expression' }).closest('section')!;
@@ -433,28 +434,31 @@ function getContext() {
 function renderPlayground({
   context = '{}',
   evaluationUnavailable,
+  expression = '1 + 1',
   onEvaluate = vi.fn<Evaluate>().mockResolvedValue({ result: 2, warnings: [] }),
   onContextChange = () => { },
-  resolveContext
+  variables = []
 }: {
   context?: string;
   evaluationUnavailable?: string;
+  expression?: string;
   onEvaluate?: Evaluate;
   onContextChange?: (context: string) => void;
-  resolveContext?: () => Promise<Record<string, unknown>>;
+  variables?: FeelVariable[];
 } = {}) {
   return render(createPlayground({
     context,
     evaluationUnavailable,
+    expression,
     onEvaluate,
     onContextChange,
-    resolveContext
+    variables
   }));
 }
 
 function rerenderPlayground(
-  rerender: ReturnType<typeof render>['rerender'],
-  props: {
+    rerender: ReturnType<typeof render>['rerender'],
+    props: {
     context?: string;
     evaluationUnavailable?: string;
     onEvaluate?: Evaluate;
@@ -466,26 +470,28 @@ function rerenderPlayground(
 function createPlayground({
   context,
   evaluationUnavailable,
+  expression = '1 + 1',
   onEvaluate,
   onContextChange = () => { },
-  resolveContext = async () => ({})
+  variables = [ ]
 }: {
   context: string;
   evaluationUnavailable?: string;
+  expression?: string;
   onEvaluate?: Evaluate;
   onContextChange?: (context: string) => void;
-  resolveContext?: () => Promise<Record<string, unknown>>;
+  variables?: FeelVariable[];
 }) {
   return (
     <FeelPlayground
-      expression="1 + 1"
-      onExpressionChange={() => { }}
-      context={context}
-      onContextChange={onContextChange}
-      resolveContext={resolveContext}
+      expression={ expression }
+      onExpressionChange={ () => { } }
+      context={ context }
+      onContextChange={ onContextChange }
       dialect="expression"
-      evaluationUnavailable={evaluationUnavailable}
-      onEvaluate={onEvaluate}
+      variables={ variables }
+      evaluationUnavailable={ evaluationUnavailable }
+      onEvaluate={ onEvaluate }
     />
   );
 }

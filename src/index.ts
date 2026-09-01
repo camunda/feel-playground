@@ -13,5 +13,7 @@ export type {
   EvaluationInput,
   EvaluationResult,
   EvaluationWarning,
-  FeelDialect
+  FeelBuiltin,
+  FeelDialect,
+  FeelLanguageContext
 } from './core/types';

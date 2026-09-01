@@ -66,13 +66,13 @@ describe('<ResultView>', () => {
     // when
     render(
       <ResultView
-        state={{ status: 'invalid-context', error: 'Invalid JSON' }}
-        expressionErrors={[{
+        state={ { status: 'invalid-context', error: 'Invalid JSON' } }
+        expressionErrors={ [ {
           from: 0,
           message: 'Unexpected token.',
           severity: 'error',
           to: 1
-        }]}
+        } ] }
       />
     );
 
@@ -227,14 +227,14 @@ describe('<ResultView>', () => {
 });
 
 function renderResult(state: PlaygroundState) {
-  return render(<ResultView state={state} />);
+  return render(<ResultView state={ state } />);
 }
 
 function renderWarning(
-  warning: { type?: string; message: string },
-  result: unknown = null
+    warning: { type?: string; message: string },
+    result: unknown = null
 ) {
-  renderResult({ status: 'warning', result, warnings: [warning] });
+  renderResult({ status: 'warning', result, warnings: [ warning ] });
 
   return within(screen.getByRole('img', { name: 'Warning' }).closest('section')!);
 }

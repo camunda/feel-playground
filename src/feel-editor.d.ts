@@ -1,3 +1,5 @@
+// TODO(jarekdanielak): Generate and publish declarations from
+// feel-editor's checked JSDoc, then remove this.
 declare module '@bpmn-io/feel-editor' {
   import type { FeelDialect } from './core/types';
   import type { FeelLintReport, FeelVariable } from './render/ExpressionEditor';

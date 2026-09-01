@@ -13,12 +13,13 @@ import {
 
 import {
   type Evaluate,
-  type EvaluationContext,
   type FeelDialect,
+  type FeelLanguageContext,
   type PlaygroundController,
   type PlaygroundState
 } from '../core/types';
 import { createPlaygroundController } from '../core/createPlaygroundController';
+import { resolveEvaluationContext } from '../core/resolveEvaluationContext';
 import { toSnippetTemplate } from '../core/snippetTemplate';
 import { ContextEditor, type ContextEditorHandle } from './ContextEditor';
 import {
@@ -40,16 +41,16 @@ const EMPTY_VARIABLES: FeelVariable[] = [];
  * Controlled FEEL playground. The host owns expression and context persistence
  * and injects the evaluator implementation.
  *
- * When `resolveContext` is given and the context is still empty, it is used to
- * prefill the context as a snippet, so the user can tab through the values.
+ * An empty context is prefilled from the variables referenced by the expression,
+ * so the user can tab through the values.
  */
 export interface FeelPlaygroundProps {
   expression: string;
   onExpressionChange(expression: string): void;
   context: string;
   onContextChange(context: string): void;
-  resolveContext?(): Promise<EvaluationContext>;
   dialect: FeelDialect;
+  feelLanguageContext?: FeelLanguageContext;
   variables?: FeelVariable[];
   onEvaluate?: Evaluate;
   evaluationUnavailable?: string;
@@ -60,8 +61,8 @@ export function FeelPlayground({
   onExpressionChange,
   context,
   onContextChange,
-  resolveContext,
   dialect,
+  feelLanguageContext,
   variables = EMPTY_VARIABLES,
   onEvaluate,
   evaluationUnavailable
@@ -88,19 +89,17 @@ export function FeelPlayground({
     onExpressionChange(nextExpression);
   };
 
-  const fillContext = async (options: { focus?: boolean } = {}) => {
-    if (!resolveContext) {
-      return;
-    }
+  const fillContext = (options: { focus?: boolean } = {}) => {
+    const resolvedContext = resolveEvaluationContext({
+      expression,
+      variables,
+      feelLanguageContext: {
+        ...feelLanguageContext,
+        dialect
+      }
+    });
 
-    try {
-      const resolvedContext = await resolveContext();
-
-      contextEditorRef.current?.insertTemplate(toSnippetTemplate(resolvedContext), options);
-    } catch {
-
-      // Keep the current context when best-effort resolution fails.
-    }
+    contextEditorRef.current?.insertTemplate(toSnippetTemplate(resolvedContext), options);
   };
 
   const handleContextReset = () => fillContext({ focus: true });
@@ -275,7 +274,7 @@ export function FeelPlayground({
               ref={ contextEditorRef }
               value={ context }
               onChange={ onContextChange }
-              onReset={ resolveContext ? handleContextReset : undefined }
+              onReset={ handleContextReset }
               error={ state.status === 'invalid-context' ? state.error : undefined }
             />
             <ResultView
