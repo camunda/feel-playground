@@ -15,7 +15,7 @@ const INITIAL_INPUT: PlaygroundInput = {
 };
 
 export function createPlaygroundController(
-  { debounce = 300 }: PlaygroundControllerOptions = {}
+    { debounce = 300 }: PlaygroundControllerOptions = {}
 ): PlaygroundController {
   let state: PlaygroundState = INITIAL_STATE;
   let input: PlaygroundInput = INITIAL_INPUT;
@@ -91,9 +91,9 @@ export function createPlaygroundController(
   }
 
   async function runEvaluation(
-    expression: string,
-    context: Record<string, unknown>,
-    scheduledRevision: number
+      expression: string,
+      context: Record<string, unknown>,
+      scheduledRevision: number
   ): Promise<void> {
     timer = null;
 

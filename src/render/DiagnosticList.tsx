@@ -24,16 +24,16 @@ export function DiagnosticList({
   }
 
   return (
-    <div className="feel-playground__diagnostics" aria-label={label}>
+    <div className="feel-playground__diagnostics" aria-label={ label }>
       {diagnostics.map((diagnostic, index) => {
         const position = getPosition(value, diagnostic.from);
 
         return (
           <button
             className="feel-playground__diagnostic"
-            key={`${diagnostic.from}-${diagnostic.to}-${index}`}
+            key={ `${diagnostic.from}-${diagnostic.to}-${index}` }
             type="button"
-            onClick={() => onSelect?.(diagnostic.from)}
+            onClick={ () => onSelect?.(diagnostic.from) }
           >
             <StatusIcon status="error" />
             <span className="feel-playground__diagnostic-position">

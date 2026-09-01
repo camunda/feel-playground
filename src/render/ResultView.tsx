@@ -25,25 +25,25 @@ export function ResultView({
     <section className="feel-playground__section feel-playground__result" aria-live="polite">
       <div className="feel-playground__section-heading">
         <h3>Result</h3>
-        <Status status={state.status} />
+        <Status status={ state.status } />
       </div>
 
       <div className="feel-playground__result-body">
         {state.status === 'warning' && (
           <div className="feel-playground__warnings">
             {state.warnings.map((warning, index) => (
-              <Warning key={index} warning={warning} />
+              <Warning key={ index } warning={ warning } />
             ))}
           </div>
         )}
-        <Result state={state} expressionErrors={expressionErrors} />
+        <Result state={ state } expressionErrors={ expressionErrors } />
       </div>
 
       <DiagnosticList
-        diagnostics={expressionErrors}
+        diagnostics={ expressionErrors }
         label="Expression errors"
-        value={expression}
-        onSelect={onSelectExpressionError}
+        value={ expression }
+        onSelect={ onSelectExpressionError }
       />
 
       <p className="feel-playground__pane-hint">
@@ -55,45 +55,45 @@ export function ResultView({
 
 function Result({ state, expressionErrors = [] }: ResultViewProps) {
   switch (state.status) {
-    case 'idle':
-      return <p>Enter an expression to evaluate.</p>;
-    case 'validating-expression':
-      return <p>Checking your FEEL expression before evaluation…</p>;
-    case 'invalid-expression':
-      return <p>Fix the errors in your FEEL expression to evaluate it.</p>;
-    case 'invalid-context':
-      return expressionErrors.length
-        ? <p>Fix the errors in your FEEL expression to evaluate it.</p>
-        : <p>Fix the errors in your context to evaluate the expression.</p>;
-    case 'scheduled':
-    case 'loading':
-      return <p>Evaluating on the configured cluster…</p>;
-    case 'unavailable':
-      return <p>{state.message}</p>;
-    case 'error':
-      return <p>{state.error}</p>;
-    case 'success':
-    case 'warning':
-      return <pre>{formatResult(state.result)}</pre>;
+  case 'idle':
+    return <p>Enter an expression to evaluate.</p>;
+  case 'validating-expression':
+    return <p>Checking your FEEL expression before evaluation…</p>;
+  case 'invalid-expression':
+    return <p>Fix the errors in your FEEL expression to evaluate it.</p>;
+  case 'invalid-context':
+    return expressionErrors.length
+      ? <p>Fix the errors in your FEEL expression to evaluate it.</p>
+      : <p>Fix the errors in your context to evaluate the expression.</p>;
+  case 'scheduled':
+  case 'loading':
+    return <p>Evaluating on the configured cluster…</p>;
+  case 'unavailable':
+    return <p>{state.message}</p>;
+  case 'error':
+    return <p>{state.error}</p>;
+  case 'success':
+  case 'warning':
+    return <pre>{formatResult(state.result)}</pre>;
   }
 }
 
 function Status({ status }: { status: PlaygroundState['status'] }) {
   switch (status) {
-    case 'idle':
-    case 'validating-expression':
-    case 'invalid-expression':
-    case 'invalid-context':
-      return null;
-    case 'scheduled':
-    case 'loading':
-      return <StatusIcon status="loading" />;
-    case 'unavailable':
-      return <StatusIcon status="warning" />;
-    case 'success':
-    case 'warning':
-    case 'error':
-      return <StatusIcon status={status} />;
+  case 'idle':
+  case 'validating-expression':
+  case 'invalid-expression':
+  case 'invalid-context':
+    return null;
+  case 'scheduled':
+  case 'loading':
+    return <StatusIcon status="loading" />;
+  case 'unavailable':
+    return <StatusIcon status="warning" />;
+  case 'success':
+  case 'warning':
+  case 'error':
+    return <StatusIcon status={ status } />;
   }
 }
 

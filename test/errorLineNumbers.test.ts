@@ -14,18 +14,19 @@ afterEach(() => {
 describe('error line numbers', () => {
 
   it('should mark line numbers containing errors', () => {
+
     // given
     const errorLineNumbers = createErrorLineNumbers();
     editor = new EditorView({
       parent: document.body,
       state: EditorState.create({
         doc: 'first\nsecond\nthird',
-        extensions: [lineNumbers(), errorLineNumbers.extension]
+        extensions: [ lineNumbers(), errorLineNumbers.extension ]
       })
     });
 
     // when
-    errorLineNumbers.update([7, 9, 13]);
+    errorLineNumbers.update([ 7, 9, 13 ]);
 
     // then
     const markedLines = editor.dom.querySelectorAll('.feel-playground__error-line-number');
@@ -34,16 +35,17 @@ describe('error line numbers', () => {
 
 
   it('should clear marked line numbers', () => {
+
     // given
     const errorLineNumbers = createErrorLineNumbers();
     editor = new EditorView({
       parent: document.body,
       state: EditorState.create({
         doc: 'first\nsecond',
-        extensions: [lineNumbers(), errorLineNumbers.extension]
+        extensions: [ lineNumbers(), errorLineNumbers.extension ]
       })
     });
-    errorLineNumbers.update([7]);
+    errorLineNumbers.update([ 7 ]);
 
     // when
     errorLineNumbers.update([]);

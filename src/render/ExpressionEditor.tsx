@@ -73,7 +73,7 @@ export const ExpressionEditor = forwardRef<ExpressionEditorHandle, ExpressionEdi
         'aria-label': 'FEEL expression'
       },
       dialect,
-      extensions: [lineNumbers(), errorLineNumbers.extension],
+      extensions: [ lineNumbers(), errorLineNumbers.extension ],
       onChange: nextValue => {
         valueRef.current = nextValue;
         errorLineNumbers.update([]);
@@ -96,7 +96,7 @@ export const ExpressionEditor = forwardRef<ExpressionEditorHandle, ExpressionEdi
       editorRef.current = null;
       container.replaceChildren();
     };
-  }, [dialect]);
+  }, [ dialect ]);
 
   useEffect(() => {
     if (!editorRef.current || valueRef.current === value) {
@@ -105,13 +105,13 @@ export const ExpressionEditor = forwardRef<ExpressionEditorHandle, ExpressionEdi
 
     valueRef.current = value;
     editorRef.current.setValue(value);
-  }, [value]);
+  }, [ value ]);
 
   useEffect(() => {
     editorRef.current?.setVariables(variables);
-  }, [variables]);
+  }, [ variables ]);
 
-  return <div className="feel-playground__expression-editor" ref={containerRef} />;
+  return <div className="feel-playground__expression-editor" ref={ containerRef } />;
 });
 
 function isError(report: FeelLintReport) {

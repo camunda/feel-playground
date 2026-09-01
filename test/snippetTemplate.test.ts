@@ -5,6 +5,7 @@ import { toSnippetTemplate } from '../src/core/snippetTemplate';
 describe('snippet template', () => {
 
   it('should turn null leaves into numbered tab stops', () => {
+
     // given
     const context = { customer: null, orderTotal: null };
 
@@ -19,6 +20,7 @@ describe('snippet template', () => {
 
 
   it('should number nested leaves', () => {
+
     // given
     const context = { customer: { id: null, name: null } };
 
@@ -33,6 +35,7 @@ describe('snippet template', () => {
 
 
   it('should keep known values', () => {
+
     // given
     const context = { count: 2, name: 'foo', done: true, missing: null };
 
@@ -47,6 +50,7 @@ describe('snippet template', () => {
 
 
   it('should handle an empty context', () => {
+
     // when
     const template = toSnippetTemplate({});
 
@@ -56,6 +60,7 @@ describe('snippet template', () => {
 
 
   it('should handle lists', () => {
+
     // given
     const context = { orders: [ { id: null } ], empty: [] };
 
@@ -70,6 +75,7 @@ describe('snippet template', () => {
 
 
   it('should not read literal text as a placeholder', () => {
+
     // given
     const context = { 'a${b}': '#{c}' };
 

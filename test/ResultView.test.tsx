@@ -19,6 +19,7 @@ afterEach(cleanup);
 describe('<ResultView>', () => {
 
   it('should prompt for an expression while idle', () => {
+
     // when
     renderResult({ status: 'idle' });
 
@@ -28,6 +29,7 @@ describe('<ResultView>', () => {
 
 
   it('should prompt for valid input when the expression is invalid', () => {
+
     // when
     renderResult({ status: 'invalid-expression' });
 
@@ -38,6 +40,7 @@ describe('<ResultView>', () => {
 
 
   it('should prompt for valid input while expression lint is pending', () => {
+
     // when
     renderResult({ status: 'validating-expression' });
 
@@ -48,6 +51,7 @@ describe('<ResultView>', () => {
 
 
   it('should prompt for valid input when the context is invalid', () => {
+
     // when
     renderResult({ status: 'invalid-context', error: 'Invalid JSON' });
 
@@ -58,16 +62,17 @@ describe('<ResultView>', () => {
 
 
   it('should prioritize expression errors over context errors', () => {
+
     // when
     render(
       <ResultView
-        state={{ status: 'invalid-context', error: 'Invalid JSON' }}
-        expressionErrors={[{
+        state={ { status: 'invalid-context', error: 'Invalid JSON' } }
+        expressionErrors={ [ {
           from: 0,
           message: 'Unexpected token.',
           severity: 'error',
           to: 1
-        }]}
+        } ] }
       />
     );
 
@@ -78,6 +83,7 @@ describe('<ResultView>', () => {
 
 
   it('should show that evaluation is scheduled', () => {
+
     // when
     renderResult({ status: 'scheduled' });
 
@@ -88,6 +94,7 @@ describe('<ResultView>', () => {
 
 
   it('should show that evaluation is loading', () => {
+
     // when
     renderResult({ status: 'loading' });
 
@@ -98,6 +105,7 @@ describe('<ResultView>', () => {
 
 
   it('should show host unavailability as a warning', () => {
+
     // when
     renderResult({ status: 'unavailable', message: 'Connect to a cluster.' });
 
@@ -108,6 +116,7 @@ describe('<ResultView>', () => {
 
 
   it('should show a successful object result', () => {
+
     // when
     renderResult({ status: 'success', result: { total: 2 } });
 
@@ -118,6 +127,7 @@ describe('<ResultView>', () => {
 
 
   it('should show a successful string result without JSON quotes', () => {
+
     // when
     renderResult({ status: 'success', result: 'approved' });
 
@@ -127,6 +137,7 @@ describe('<ResultView>', () => {
 
 
   it('should show an error provided by the host', () => {
+
     // when
     renderResult({ status: 'error', error: 'Request failed.' });
 
@@ -137,6 +148,7 @@ describe('<ResultView>', () => {
 
 
   it('should show a generic host warning unchanged', () => {
+
     // when
     renderWarning({ message: 'Result may be incomplete.' });
 
@@ -147,6 +159,7 @@ describe('<ResultView>', () => {
 
 
   it('should format a no-variable warning type provided by the host', () => {
+
     // when
     renderWarning({
       type: 'NO_VARIABLE_FOUND',
@@ -159,6 +172,7 @@ describe('<ResultView>', () => {
 
 
   it('should format a no-variable warning message provided by the host', () => {
+
     // when
     renderWarning({ message: "No variable found with name 'customer'" });
 
@@ -168,6 +182,7 @@ describe('<ResultView>', () => {
 
 
   it('should not duplicate an existing no-variable prefix', () => {
+
     // when
     renderWarning({ message: "No Variable Found: No variable found with name 'customer'" });
 
@@ -178,10 +193,11 @@ describe('<ResultView>', () => {
 
 
   it('should format an invalid-type warning type provided by the host', () => {
+
     // when
     renderWarning({
       type: 'INVALID_TYPE',
-      message: `Can't add 'null' to '1'`
+      message: 'Can\'t add \'null\' to \'1\''
     });
 
     // then
@@ -190,8 +206,9 @@ describe('<ResultView>', () => {
 
 
   it('should format an invalid-type warning message provided by the host', () => {
+
     // when
-    renderWarning({ message: `Can't add 'null' to '1'` });
+    renderWarning({ message: 'Can\'t add \'null\' to \'1\'' });
 
     // then
     expect(screen.getByText('Invalid Type:').tagName).toBe('STRONG');
@@ -199,6 +216,7 @@ describe('<ResultView>', () => {
 
 
   it('should show the result alongside host warnings', () => {
+
     // when
     renderWarning({ message: 'Result may be incomplete.' }, 42);
 
@@ -209,14 +227,14 @@ describe('<ResultView>', () => {
 });
 
 function renderResult(state: PlaygroundState) {
-  return render(<ResultView state={state} />);
+  return render(<ResultView state={ state } />);
 }
 
 function renderWarning(
-  warning: { type?: string; message: string },
-  result: unknown = null
+    warning: { type?: string; message: string },
+    result: unknown = null
 ) {
-  renderResult({ status: 'warning', result, warnings: [warning] });
+  renderResult({ status: 'warning', result, warnings: [ warning ] });
 
   return within(screen.getByRole('img', { name: 'Warning' }).closest('section')!);
 }

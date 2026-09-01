@@ -77,10 +77,10 @@ export function FeelPlayground({
     startY: number;
   } | null>(null);
   const openEvaluationHeightRef = useRef<number | null>(null);
-  const [state, setState] = useState<PlaygroundState>({ status: 'idle' });
-  const [expressionValid, setExpressionValid] = useState<boolean | null>(null);
-  const [expressionErrors, setExpressionErrors] = useState<FeelLintReport[]>([]);
-  const [evaluationHeight, setEvaluationHeight] = useState<number | null>(null);
+  const [ state, setState ] = useState<PlaygroundState>({ status: 'idle' });
+  const [ expressionValid, setExpressionValid ] = useState<boolean | null>(null);
+  const [ expressionErrors, setExpressionErrors ] = useState<FeelLintReport[]>([]);
+  const [ evaluationHeight, setEvaluationHeight ] = useState<number | null>(null);
 
   const handleExpressionChange = (nextExpression: string) => {
     setExpressionValid(null);
@@ -98,6 +98,7 @@ export function FeelPlayground({
 
       contextEditorRef.current?.insertTemplate(toSnippetTemplate(resolvedContext), options);
     } catch {
+
       // Keep the current context when best-effort resolution fails.
     }
   };
@@ -134,7 +135,7 @@ export function FeelPlayground({
       onEvaluate,
       evaluationUnavailable
     });
-  }, [expression, expressionValid, context, dialect, onEvaluate, evaluationUnavailable]);
+  }, [ expression, expressionValid, context, dialect, onEvaluate, evaluationUnavailable ]);
 
   const resizeEvaluation = (height: number) => {
     const container = containerRef.current;
@@ -234,7 +235,7 @@ export function FeelPlayground({
   return (
     <C4Provider>
       <TooltipProvider>
-        <div className="feel-playground" ref={containerRef} style={style}>
+        <div className="feel-playground" ref={ containerRef } style={ style }>
           <section className="feel-playground__section feel-playground__expression">
             <div className="feel-playground__section-heading">
               <h3>{dialect === 'unaryTests' ? 'Unary tests' : 'FEEL expression'}</h3>
@@ -246,13 +247,13 @@ export function FeelPlayground({
               )}
             </div>
             <ExpressionEditor
-              ref={expressionEditorRef}
-              value={expression}
-              onChange={handleExpressionChange}
-              onValidityChange={setExpressionValid}
-              onErrorsChange={setExpressionErrors}
-              dialect={dialect}
-              variables={variables}
+              ref={ expressionEditorRef }
+              value={ expression }
+              onChange={ handleExpressionChange }
+              onValidityChange={ setExpressionValid }
+              onErrorsChange={ setExpressionErrors }
+              dialect={ dialect }
+              variables={ variables }
             />
           </section>
 
@@ -261,27 +262,27 @@ export function FeelPlayground({
             aria-orientation="horizontal"
             className="feel-playground__resize-handle"
             role="separator"
-            tabIndex={0}
-            onKeyDown={handleResizeKeyDown}
-            onPointerDown={handleResizeStart}
-            onPointerMove={handleResize}
-            onPointerUp={handleResizeEnd}
-            onPointerCancel={handleResizeEnd}
+            tabIndex={ 0 }
+            onKeyDown={ handleResizeKeyDown }
+            onPointerDown={ handleResizeStart }
+            onPointerMove={ handleResize }
+            onPointerUp={ handleResizeEnd }
+            onPointerCancel={ handleResizeEnd }
           />
 
-          <div className="feel-playground__evaluation" ref={evaluationRef}>
+          <div className="feel-playground__evaluation" ref={ evaluationRef }>
             <ContextEditor
-              ref={contextEditorRef}
-              value={context}
-              onChange={onContextChange}
-              onReset={resolveContext ? handleContextReset : undefined}
-              error={state.status === 'invalid-context' ? state.error : undefined}
+              ref={ contextEditorRef }
+              value={ context }
+              onChange={ onContextChange }
+              onReset={ resolveContext ? handleContextReset : undefined }
+              error={ state.status === 'invalid-context' ? state.error : undefined }
             />
             <ResultView
-              state={state}
-              expression={expression}
-              expressionErrors={expressionErrors}
-              onSelectExpressionError={position => expressionEditorRef.current?.focus(position)}
+              state={ state }
+              expression={ expression }
+              expressionErrors={ expressionErrors }
+              onSelectExpressionError={ position => expressionEditorRef.current?.focus(position) }
             />
           </div>
         </div>

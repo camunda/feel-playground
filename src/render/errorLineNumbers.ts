@@ -40,7 +40,7 @@ const errorLines = StateField.define<RangeSet<GutterMarker>>({
 export function createErrorLineNumbers(): {
   extension: Extension;
   update(positions: readonly number[]): void;
-} {
+  } {
   let view: EditorView | null = null;
 
   const viewBridge = ViewPlugin.fromClass(class {
@@ -54,7 +54,7 @@ export function createErrorLineNumbers(): {
   });
 
   return {
-    extension: [errorLines, viewBridge],
+    extension: [ errorLines, viewBridge ],
     update(positions) {
       view?.dispatch({ effects: setErrorLines.of(positions) });
     }

@@ -118,7 +118,7 @@ export function ContextEditor({ value, onChange, onReset, error, ref }: ContextE
         insert: value
       }
     });
-  }, [value]);
+  }, [ value ]);
 
   useEffect(() => {
     const editor = editorRef.current;
@@ -136,12 +136,12 @@ export function ContextEditor({ value, onChange, onReset, error, ref }: ContextE
 
     editor.dispatch(setDiagnostics(
       editor.state,
-      error ? [createDiagnostic(error, editor.state.doc.length)] : []
+      error ? [ createDiagnostic(error, editor.state.doc.length) ] : []
     ));
-  }, [error]);
+  }, [ error ]);
 
   const diagnostics = error
-    ? [createDiagnostic(error, value.length)]
+    ? [ createDiagnostic(error, value.length) ]
     : [];
 
   const handleDiagnosticSelect = (position: number) => {
@@ -170,7 +170,7 @@ export function ContextEditor({ value, onChange, onReset, error, ref }: ContextE
                   aria-label="Reset to prefilled context"
                   size="icon-xs"
                   variant="ghost"
-                  onClick={onReset}
+                  onClick={ onReset }
                 >
                   <svg
                     aria-hidden="true"
@@ -201,13 +201,13 @@ export function ContextEditor({ value, onChange, onReset, error, ref }: ContextE
       <div className="feel-playground__context-body">
         <div
           className="feel-playground__context-editor"
-          ref={containerRef}
+          ref={ containerRef }
         />
         <DiagnosticList
-          diagnostics={diagnostics}
+          diagnostics={ diagnostics }
           label="Context errors"
-          value={value}
-          onSelect={handleDiagnosticSelect}
+          value={ value }
+          onSelect={ handleDiagnosticSelect }
         />
       </div>
 

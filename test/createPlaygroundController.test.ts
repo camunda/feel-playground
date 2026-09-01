@@ -21,7 +21,7 @@ const VALID_INPUT: PlaygroundInput = {
 };
 
 describe('createPlaygroundController', () => {
-  
+
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -32,6 +32,7 @@ describe('createPlaygroundController', () => {
 
 
   it('should remain idle without an expression', () => {
+
     // given
     const onEvaluate = vi.fn();
     const controller = createPlaygroundController();
@@ -46,6 +47,7 @@ describe('createPlaygroundController', () => {
 
 
   it('should reject an invalid expression locally', () => {
+
     // given
     const onEvaluate = vi.fn();
     const controller = createPlaygroundController();
@@ -60,6 +62,7 @@ describe('createPlaygroundController', () => {
 
 
   it('should wait for expression lint before evaluating', () => {
+
     // given
     const onEvaluate = vi.fn();
     const controller = createPlaygroundController();
@@ -74,6 +77,7 @@ describe('createPlaygroundController', () => {
 
 
   it('should reject malformed JSON context locally', () => {
+
     // given
     const onEvaluate = vi.fn();
     const controller = createPlaygroundController();
@@ -88,6 +92,7 @@ describe('createPlaygroundController', () => {
 
 
   it('should reject non-object JSON context locally', () => {
+
     // given
     const controller = createPlaygroundController();
 
@@ -103,6 +108,7 @@ describe('createPlaygroundController', () => {
 
 
   it('should accept an empty context as an object', async () => {
+
     // given
     const onEvaluate = vi.fn().mockResolvedValue({ result: 2, warnings: [] });
     const controller = createPlaygroundController({ debounce: 0 });
@@ -120,6 +126,7 @@ describe('createPlaygroundController', () => {
 
 
   it('should show the default unavailable message without a host evaluator', () => {
+
     // given
     const controller = createPlaygroundController();
 
@@ -135,6 +142,7 @@ describe('createPlaygroundController', () => {
 
 
   it('should show the unavailable message provided by the host', () => {
+
     // given
     const controller = createPlaygroundController();
 
@@ -153,6 +161,7 @@ describe('createPlaygroundController', () => {
 
 
   it('should schedule a valid evaluation', () => {
+
     // given
     const onEvaluate = vi.fn();
     const controller = createPlaygroundController();
@@ -166,6 +175,7 @@ describe('createPlaygroundController', () => {
 
 
   it('should show loading while the host evaluates', async () => {
+
     // given
     const onEvaluate: Evaluate = vi.fn(() => new Promise<never>(() => {}));
     const controller = createPlaygroundController({ debounce: 0 });
@@ -180,6 +190,7 @@ describe('createPlaygroundController', () => {
 
 
   it('should show a result returned by the host', async () => {
+
     // given
     const onEvaluate = vi.fn().mockResolvedValue({ result: { total: 2 }, warnings: [] });
     const controller = createPlaygroundController({ debounce: 0 });
@@ -197,6 +208,7 @@ describe('createPlaygroundController', () => {
 
 
   it('should show warnings returned by the host', async () => {
+
     // given
     const warnings = [ { message: 'No variable found with name x' } ];
     const onEvaluate = vi.fn().mockResolvedValue({ result: null, warnings });
@@ -216,6 +228,7 @@ describe('createPlaygroundController', () => {
 
 
   it('should show an error thrown by the host', async () => {
+
     // given
     const onEvaluate = vi.fn().mockRejectedValue(new Error('Cluster unavailable.'));
     const controller = createPlaygroundController({ debounce: 0 });
@@ -233,6 +246,7 @@ describe('createPlaygroundController', () => {
 
 
   it('should show a fallback for a host failure without a message', async () => {
+
     // given
     const onEvaluate = vi.fn().mockRejectedValue(null);
     const controller = createPlaygroundController({ debounce: 0 });

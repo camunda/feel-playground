@@ -19,7 +19,7 @@ export function StatusIcon({ status }: StatusIconProps) {
         className="feel-playground__status-icon status-icon loading"
         viewBox="0 0 100 100"
         role="img"
-        aria-label={label}
+        aria-label={ label }
       >
         <circle className="feel-playground__loading-background" cx="50" cy="50" r="42" />
         <circle className="feel-playground__loading-stroke" cx="50" cy="50" r="42" />
@@ -29,13 +29,13 @@ export function StatusIcon({ status }: StatusIconProps) {
 
   return (
     <svg
-      className={`feel-playground__status-icon status-icon ${status}`}
+      className={ `feel-playground__status-icon status-icon ${status}` }
       viewBox="0 0 16 16"
       fill="currentColor"
       role="img"
-      aria-label={label}
+      aria-label={ label }
     >
-      <path d={paths[status]} />
+      <path d={ paths[status] } />
     </svg>
   );
 }

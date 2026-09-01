@@ -102,9 +102,9 @@ const LOADING_EVALUATOR: Evaluate = async (_, { signal }) => {
 };
 
 export function App() {
-  const [preview, setPreview] = useState<Preview>('live');
-  const [expression, setExpression] = useState(() => getPreviewValues('live').expression);
-  const [context, setContext] = useState(() => getPreviewValues('live').context);
+  const [ preview, setPreview ] = useState<Preview>('live');
+  const [ expression, setExpression ] = useState(() => getPreviewValues('live').expression);
+  const [ context, setContext ] = useState(() => getPreviewValues('live').context);
 
   const selectPreview = (nextPreview: Preview) => {
     const nextValues = getPreviewValues(nextPreview);
@@ -131,11 +131,11 @@ export function App() {
         <div className="preview-switcher__controls">
           {PREVIEWS.map(({ id, label }) => (
             <button
-              key={id}
+              key={ id }
               type="button"
-              className={id === preview ? 'is-active' : undefined}
-              aria-pressed={id === preview}
-              onClick={() => selectPreview(id)}
+              className={ id === preview ? 'is-active' : undefined }
+              aria-pressed={ id === preview }
+              onClick={ () => selectPreview(id) }
             >
               {label}
             </button>
@@ -147,15 +147,15 @@ export function App() {
         <FeelPlayground
 
           // each preview is its own scenario, so remount to prefill again
-          key={preview}
-          expression={expression}
-          onExpressionChange={setExpression}
-          context={context}
-          onContextChange={setContext}
-          resolveContext={() => Promise.resolve(getPreviewContext(preview))}
+          key={ preview }
+          expression={ expression }
+          onExpressionChange={ setExpression }
+          context={ context }
+          onContextChange={ setContext }
+          resolveContext={ () => Promise.resolve(getPreviewContext(preview)) }
           dialect="expression"
-          evaluationUnavailable={evaluationUnavailable}
-          onEvaluate={onEvaluate}
+          evaluationUnavailable={ evaluationUnavailable }
+          onEvaluate={ onEvaluate }
         />
       </div>
     </main>
@@ -164,31 +164,31 @@ export function App() {
 
 function getPreviewValues(preview: Preview) {
   switch (preview) {
-    case 'live':
-      return { expression: INITIAL_EXPRESSION, context: '' };
-    case 'empty':
-      return { expression: '', context: INITIAL_CONTEXT };
-    case 'expression-error':
-      return { expression: ERROR_EXPRESSION, context: INITIAL_CONTEXT };
-    case 'context-error':
-      return { expression: INITIAL_EXPRESSION, context: ERROR_CONTEXT };
-    case 'warning':
-      return { expression: INITIAL_EXPRESSION, context: WARNING_CONTEXT };
-    default:
-      return { expression: INITIAL_EXPRESSION, context: INITIAL_CONTEXT };
+  case 'live':
+    return { expression: INITIAL_EXPRESSION, context: '' };
+  case 'empty':
+    return { expression: '', context: INITIAL_CONTEXT };
+  case 'expression-error':
+    return { expression: ERROR_EXPRESSION, context: INITIAL_CONTEXT };
+  case 'context-error':
+    return { expression: INITIAL_EXPRESSION, context: ERROR_CONTEXT };
+  case 'warning':
+    return { expression: INITIAL_EXPRESSION, context: WARNING_CONTEXT };
+  default:
+    return { expression: INITIAL_EXPRESSION, context: INITIAL_CONTEXT };
   }
 }
 
 function getPreviewContext(preview: Preview): EvaluationContext {
   switch (preview) {
-    case 'live':
-      return LIVE_RESOLVED_CONTEXT;
-    case 'context-error':
-      return ERROR_RESOLVED_CONTEXT;
-    case 'warning':
-      return JSON.parse(WARNING_CONTEXT);
-    default:
-      return JSON.parse(INITIAL_CONTEXT);
+  case 'live':
+    return LIVE_RESOLVED_CONTEXT;
+  case 'context-error':
+    return ERROR_RESOLVED_CONTEXT;
+  case 'warning':
+    return JSON.parse(WARNING_CONTEXT);
+  default:
+    return JSON.parse(INITIAL_CONTEXT);
   }
 }
 
@@ -197,15 +197,15 @@ function getPreviewConfig(preview: Preview): {
   onEvaluate?: Evaluate;
 } {
   switch (preview) {
-    case 'unavailable':
-      return { evaluationUnavailable: 'No Camunda 8 cluster connection.' };
-    case 'loading':
-      return { onEvaluate: LOADING_EVALUATOR };
-    case 'success':
-      return { onEvaluate: SUCCESS_EVALUATOR };
-    case 'error':
-      return { onEvaluate: ERROR_EVALUATOR };
-    default:
-      return { onEvaluate: evaluateOnConfiguredCluster };
+  case 'unavailable':
+    return { evaluationUnavailable: 'No Camunda 8 cluster connection.' };
+  case 'loading':
+    return { onEvaluate: LOADING_EVALUATOR };
+  case 'success':
+    return { onEvaluate: SUCCESS_EVALUATOR };
+  case 'error':
+    return { onEvaluate: ERROR_EVALUATOR };
+  default:
+    return { onEvaluate: evaluateOnConfiguredCluster };
   }
 }

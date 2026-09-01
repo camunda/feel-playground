@@ -79,6 +79,7 @@ afterEach(() => {
 describe('<FeelPlayground>', () => {
 
   it('should show an expression error in the result panel and focus it in the editor', async () => {
+
     // given
     renderPlayground();
     act(() => feelEditor.onLint?.([
@@ -120,15 +121,16 @@ describe('<FeelPlayground>', () => {
 
 
   it('should clear an expression error reported by the editor', () => {
+
     // given
     renderPlayground();
-    act(() => feelEditor.onLint?.([{
+    act(() => feelEditor.onLint?.([ {
       from: 2,
       message: 'The operator needs a right-hand value.',
       severity: 'error',
       to: 3,
       type: 'Syntax Error'
-    }]));
+    } ]));
 
     // when
     act(() => feelEditor.onLint?.([]));
@@ -142,6 +144,7 @@ describe('<FeelPlayground>', () => {
 
 
   it('should wait for lint before evaluating a changed expression', async () => {
+
     // given
     const onEvaluate = vi.fn().mockResolvedValue({ result: 2, warnings: [] });
 
@@ -161,6 +164,7 @@ describe('<FeelPlayground>', () => {
 
 
   it('should preserve editor configuration through lint and evaluation updates', async () => {
+
     // given
     const onEvaluate = vi.fn().mockResolvedValue({ result: 2, warnings: [] });
     renderPlayground({ onEvaluate });
@@ -197,6 +201,7 @@ describe('<FeelPlayground>', () => {
 
 
   it('should ignore Home and End when resizing the evaluation pane', () => {
+
     // given
     renderPlayground();
 
@@ -212,6 +217,7 @@ describe('<FeelPlayground>', () => {
 
 
   it('should toggle the evaluation pane on resize handle click', () => {
+
     // given
     renderPlayground();
 
@@ -248,6 +254,7 @@ describe('<FeelPlayground>', () => {
 
 
   it('should explain the context and result panes', () => {
+
     // when
     renderPlayground();
 
@@ -258,11 +265,12 @@ describe('<FeelPlayground>', () => {
 
 
   it('should reload context and evaluate again', async () => {
+
     // given
     const onEvaluate = vi.fn<Evaluate>().mockResolvedValue({ result: 2, warnings: [] });
     const resolveContext = vi.fn().mockResolvedValue({ customer: null });
     function Playground() {
-      const [context, setContext] = useState('{ "customer": 42 }');
+      const [ context, setContext ] = useState('{ "customer": 42 }');
 
       return createPlayground({
         context,
@@ -296,6 +304,7 @@ describe('<FeelPlayground>', () => {
 
 
   it('should prefill the context on open', async () => {
+
     // given
     const resolveContext = vi.fn().mockResolvedValue({ customer: { id: null } });
 
@@ -310,6 +319,7 @@ describe('<FeelPlayground>', () => {
 
 
   it('should prefill the context with one tab stop per variable', async () => {
+
     // given
     const resolveContext = vi.fn().mockResolvedValue({ base: null, protocol: null });
 
@@ -325,6 +335,7 @@ describe('<FeelPlayground>', () => {
 
 
   it('should keep a context restored by the host', async () => {
+
     // given
     const resolveContext = vi.fn().mockResolvedValue({ customer: null });
 
@@ -338,6 +349,7 @@ describe('<FeelPlayground>', () => {
 
 
   it('should show a context error for malformed JSON', async () => {
+
     // when
     renderPlayground({ context: '{' });
 
@@ -349,6 +361,8 @@ describe('<FeelPlayground>', () => {
     const errorIcon = within(contextHeading).getByRole('img', { name: 'Error' });
 
     expect(await within(context).findAllByRole('img', { name: 'Error' })).toHaveLength(2);
+
+    // eslint-disable-next-line no-bitwise -- compareDocumentPosition returns a bitmask
     expect(resetButton.compareDocumentPosition(errorIcon) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(within(context).getByRole('button', { name: /Context error/ })).toBeTruthy();
     expect(within(context).queryByText(/at position \d+/)).toBeNull();
@@ -358,6 +372,7 @@ describe('<FeelPlayground>', () => {
 
 
   it('should show a context error for non-object JSON', async () => {
+
     // when
     renderPlayground({ context: '[]' });
 
@@ -368,6 +383,7 @@ describe('<FeelPlayground>', () => {
 
 
   it('should focus a context error reported by the editor', async () => {
+
     // given
     renderPlayground({ context: '{' });
 
@@ -383,17 +399,18 @@ describe('<FeelPlayground>', () => {
 
 
   it('should show expression and context errors together', async () => {
+
     // given
     renderPlayground({ context: '{' });
 
     // when
-    act(() => feelEditor.onLint?.([{
+    act(() => feelEditor.onLint?.([ {
       from: 2,
       message: 'The operator needs a right-hand value.',
       severity: 'error',
       to: 3,
       type: 'Syntax Error'
-    }]));
+    } ]));
 
     // then
     const expression = screen.getByRole('heading', { name: 'FEEL expression' }).closest('section')!;
@@ -436,8 +453,8 @@ function renderPlayground({
 }
 
 function rerenderPlayground(
-  rerender: ReturnType<typeof render>['rerender'],
-  props: {
+    rerender: ReturnType<typeof render>['rerender'],
+    props: {
     context?: string;
     evaluationUnavailable?: string;
     onEvaluate?: Evaluate;
@@ -462,13 +479,13 @@ function createPlayground({
   return (
     <FeelPlayground
       expression="1 + 1"
-      onExpressionChange={() => { }}
-      context={context}
-      onContextChange={onContextChange}
-      resolveContext={resolveContext}
+      onExpressionChange={ () => { } }
+      context={ context }
+      onContextChange={ onContextChange }
+      resolveContext={ resolveContext }
       dialect="expression"
-      evaluationUnavailable={evaluationUnavailable}
-      onEvaluate={onEvaluate}
+      evaluationUnavailable={ evaluationUnavailable }
+      onEvaluate={ onEvaluate }
     />
   );
 }
