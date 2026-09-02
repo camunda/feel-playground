@@ -17,6 +17,7 @@ import {
 	FeelPlayground,
 	type Evaluate
 } from '@camunda/feel-playground';
+import '@camunda/design-system/styles.css';
 import '@camunda/feel-playground/style.css';
 
 const evaluate: Evaluate = async (input, { signal }) => {
@@ -52,7 +53,7 @@ export function Playground() {
 
 Evaluation is remote-only. Authentication, connectivity, and endpoint-specific request mapping remain host responsibilities. The evaluator must return an object containing `result` and a `warnings` array.
 
-The package requires React 19. Its stylesheet includes the Camunda Design System tokens and component styles and defines the playground's appearance; hosts do not need to provide a design-system scope or playground theme variables.
+The package requires React 19 and the Camunda Design System. Import the design-system stylesheet once at the application root, followed by the playground stylesheet. In applications that also use Carbon, load Carbon styles first, then design-system styles, then consumer overrides.
 
 The context is a controlled, serialized JSON value. When it is empty, the playground analyzes the expression and prefills the variables it references. The optional `variables` tree provides model-known structure for autocomplete and context generation; references missing from that tree are added with `null` values. The reload action restores this generated context without replacing a context restored by the host on open.
 
