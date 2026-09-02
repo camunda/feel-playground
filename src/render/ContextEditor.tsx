@@ -186,7 +186,9 @@ export function ContextEditor({ value, onChange, onReset, error, ref }: ContextE
                   </svg>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Reset to prefilled context</TooltipContent>
+              <TooltipContent className="feel-playground__context-reset-tooltip">
+                Reset to prefilled context
+              </TooltipContent>
             </Tooltip>
           )}
           {error && (
