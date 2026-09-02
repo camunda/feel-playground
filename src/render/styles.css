@@ -298,13 +298,18 @@
   white-space: nowrap;
 }
 
-.feel-playground__result pre {
-  overflow: auto;
-  margin: 0;
-  color: var(--neutral-foreground-strong);
-  font: inherit;
-  white-space: pre-wrap;
-  word-break: break-word;
+.feel-playground__result-editor .cm-editor,
+.feel-playground__result-editor .cm-scroller {
+  background: var(--background);
+}
+
+.feel-playground__result-editor .cm-content,
+.feel-playground__result-editor .cm-line {
+  padding: 0;
+}
+
+.feel-playground__result-editor .cm-focused {
+  outline: none;
 }
 
 .feel-playground__status-icon.success {

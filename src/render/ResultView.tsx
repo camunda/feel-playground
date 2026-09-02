@@ -6,6 +6,7 @@ import {
   DiagnosticList,
   type PlaygroundDiagnostic
 } from './DiagnosticList';
+import { ResultEditor } from './ResultEditor';
 import { StatusIcon } from './StatusIcon';
 
 interface ResultViewProps {
@@ -74,7 +75,7 @@ function Result({ state, expressionErrors = [] }: ResultViewProps) {
     return <p>{state.error}</p>;
   case 'success':
   case 'warning':
-    return <pre>{formatResult(state.result)}</pre>;
+    return <ResultEditor value={ formatResult(state.result) } />;
   }
 }
 
@@ -98,10 +99,6 @@ function Status({ status }: { status: PlaygroundState['status'] }) {
 }
 
 function formatResult(result: unknown): string {
-  if (typeof result === 'string') {
-    return result;
-  }
-
   const serialized = JSON.stringify(result, null, 2);
 
   return typeof serialized === 'undefined' ? String(result) : serialized;

@@ -118,21 +118,47 @@ describe('<ResultView>', () => {
   it('should show a successful object result', () => {
 
     // when
-    renderResult({ status: 'success', result: { total: 2 } });
+    const { container } = renderResult({ status: 'success', result: { total: 2 } });
 
     // then
-    expect(screen.getByText(/"total": 2/)).toBeTruthy();
+    expect(container.querySelector('.feel-playground__result-editor')?.textContent).toContain('"total": 2');
     expect(screen.getByRole('img', { name: 'Success' })).toBeTruthy();
   });
 
 
-  it('should show a successful string result without JSON quotes', () => {
+  it('should show an evaluation result in a minimal read-only editor', () => {
 
     // when
-    renderResult({ status: 'success', result: 'approved' });
+    const { container } = renderResult({ status: 'success', result: { total: 2 } });
 
     // then
-    expect(screen.getByText('approved')).toBeTruthy();
+    const editor = container.querySelector('.feel-playground__result-editor .cm-editor');
+    const content = container.querySelector('.feel-playground__result-editor .cm-content');
+
+    expect(editor).toBeTruthy();
+    expect(content?.getAttribute('contenteditable')).toBe('false');
+    expect(content?.getAttribute('tabindex')).toBe('-1');
+    expect(container.querySelector('.feel-playground__result-editor .cm-gutters')).toBeNull();
+  });
+
+
+  it('should not show an editor without an evaluation result', () => {
+
+    // when
+    const { container } = renderResult({ status: 'loading' });
+
+    // then
+    expect(container.querySelector('.feel-playground__result-editor')).toBeNull();
+  });
+
+
+  it('should show a successful string result with JSON quotes', () => {
+
+    // when
+    const { container } = renderResult({ status: 'success', result: 'approved' });
+
+    // then
+    expect(container.querySelector('.feel-playground__result-editor')?.textContent).toBe('"approved"');
   });
 
 
