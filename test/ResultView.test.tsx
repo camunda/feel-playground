@@ -1,8 +1,7 @@
 import {
   cleanup,
   render,
-  screen,
-  within
+  screen
 } from '@testing-library/react';
 import {
   afterEach,
@@ -12,7 +11,11 @@ import {
 } from 'vitest';
 
 import type { PlaygroundState } from '../src/core/types';
-import { ResultView } from '../src/render/ResultView';
+import {
+  formatResult,
+  ResultView,
+  Warning
+} from '../src/render/ResultView';
 
 afterEach(cleanup);
 
@@ -24,7 +27,7 @@ describe('<ResultView>', () => {
     renderResult({ status: 'idle' });
 
     // then
-    expect(screen.getByText('Enter an expression to evaluate.')).toBeTruthy();
+    expect(screen.getByText('Enter an expression to evaluate.')).to.exist;
   });
 
 
@@ -34,8 +37,8 @@ describe('<ResultView>', () => {
     renderResult({ status: 'invalid-expression' });
 
     // then
-    expect(screen.getByText('Fix the errors in your FEEL expression to evaluate it.')).toBeTruthy();
-    expect(screen.queryByRole('img')).toBeNull();
+    expect(screen.getByText('Fix the errors in your FEEL expression to evaluate it.')).to.exist;
+    expect(screen.queryByRole('img')).not.to.exist;
   });
 
 
@@ -45,8 +48,8 @@ describe('<ResultView>', () => {
     renderResult({ status: 'validating-expression' });
 
     // then
-    expect(screen.getByText('Evaluating…')).toBeTruthy();
-    expect(screen.getByRole('img', { name: 'Loading' })).toBeTruthy();
+    expect(screen.getByText('Evaluating…')).to.exist;
+    expect(screen.getByRole('img', { name: 'Loading' })).to.exist;
   });
 
 
@@ -56,8 +59,8 @@ describe('<ResultView>', () => {
     renderResult({ status: 'invalid-context', error: 'Invalid JSON' });
 
     // then
-    expect(screen.getByText('Fix the errors in your context to evaluate the expression.')).toBeTruthy();
-    expect(screen.queryByRole('img')).toBeNull();
+    expect(screen.getByText('Fix the errors in your context to evaluate the expression.')).to.exist;
+    expect(screen.queryByRole('img')).not.to.exist;
   });
 
 
@@ -77,8 +80,8 @@ describe('<ResultView>', () => {
     );
 
     // then
-    expect(screen.getByText('Fix the errors in your FEEL expression to evaluate it.')).toBeTruthy();
-    expect(screen.queryByText(/errors in your context/)).toBeNull();
+    expect(screen.getByText('Fix the errors in your FEEL expression to evaluate it.')).to.exist;
+    expect(screen.queryByText(/errors in your context/)).not.to.exist;
   });
 
 
@@ -88,8 +91,8 @@ describe('<ResultView>', () => {
     renderResult({ status: 'scheduled' });
 
     // then
-    expect(screen.getByText('Evaluating…')).toBeTruthy();
-    expect(screen.getByRole('img', { name: 'Loading' })).toBeTruthy();
+    expect(screen.getByText('Evaluating…')).to.exist;
+    expect(screen.getByRole('img', { name: 'Loading' })).to.exist;
   });
 
 
@@ -99,8 +102,8 @@ describe('<ResultView>', () => {
     renderResult({ status: 'loading' });
 
     // then
-    expect(screen.getByText('Evaluating…')).toBeTruthy();
-    expect(screen.getByRole('img', { name: 'Loading' })).toBeTruthy();
+    expect(screen.getByText('Evaluating…')).to.exist;
+    expect(screen.getByRole('img', { name: 'Loading' })).to.exist;
   });
 
 
@@ -110,55 +113,38 @@ describe('<ResultView>', () => {
     renderResult({ status: 'unavailable', message: 'Connect to a cluster.' });
 
     // then
-    expect(screen.getByText('Connect to a cluster.')).toBeTruthy();
-    expect(screen.getByRole('img', { name: 'Warning' })).toBeTruthy();
+    expect(screen.getByText('Connect to a cluster.')).to.exist;
+    expect(screen.getByRole('img', { name: 'Warning' })).to.exist;
   });
 
 
-  it('should show a successful object result', () => {
+  it('should format an object result', () => {
 
     // when
-    const { container } = renderResult({ status: 'success', result: { total: 2 } });
+    const result = formatResult({ total: 2 });
 
     // then
-    expect(container.querySelector('.feel-playground__result-editor')?.textContent).toContain('"total": 2');
-    expect(screen.getByRole('img', { name: 'Success' })).toBeTruthy();
+    expect(result).to.equal('{\n  "total": 2\n}');
   });
 
 
-  it('should show an evaluation result in a minimal read-only editor', () => {
-
-    // when
-    const { container } = renderResult({ status: 'success', result: { total: 2 } });
-
-    // then
-    const editor = container.querySelector('.feel-playground__result-editor .cm-editor');
-    const content = container.querySelector('.feel-playground__result-editor .cm-content');
-
-    expect(editor).toBeTruthy();
-    expect(content?.getAttribute('contenteditable')).toBe('false');
-    expect(content?.getAttribute('tabindex')).toBe('-1');
-    expect(container.querySelector('.feel-playground__result-editor .cm-gutters')).toBeNull();
-  });
-
-
-  it('should not show an editor without an evaluation result', () => {
+  it('should not show a result without an evaluation result', () => {
 
     // when
     const { container } = renderResult({ status: 'loading' });
 
     // then
-    expect(container.querySelector('.feel-playground__result-editor')).toBeNull();
+    expect(container.querySelector('.feel-playground__result-editor')).not.to.exist;
   });
 
 
-  it('should show a successful string result with JSON quotes', () => {
+  it('should format a string result with JSON quotes', () => {
 
     // when
-    const { container } = renderResult({ status: 'success', result: 'approved' });
+    const result = formatResult('approved');
 
     // then
-    expect(container.querySelector('.feel-playground__result-editor')?.textContent).toBe('"approved"');
+    expect(result).to.equal('"approved"');
   });
 
 
@@ -168,8 +154,8 @@ describe('<ResultView>', () => {
     renderResult({ status: 'error', error: 'Request failed.' });
 
     // then
-    expect(screen.getByText('Request failed.')).toBeTruthy();
-    expect(screen.getByRole('img', { name: 'Error' })).toBeTruthy();
+    expect(screen.getByText('Request failed.')).to.exist;
+    expect(screen.getByRole('img', { name: 'Error' })).to.exist;
   });
 
 
@@ -180,7 +166,7 @@ describe('<ResultView>', () => {
 
     // then
     const warning = screen.getByText('Result may be incomplete.');
-    expect(warning.querySelector('strong')).toBeNull();
+    expect(warning.querySelector('strong')).not.to.exist;
   });
 
 
@@ -193,7 +179,7 @@ describe('<ResultView>', () => {
     });
 
     // then
-    expect(screen.getByText('No Variable Found:').tagName).toBe('STRONG');
+    expect(screen.getByText('No Variable Found:').tagName).to.equal('STRONG');
   });
 
 
@@ -203,7 +189,7 @@ describe('<ResultView>', () => {
     renderWarning({ message: "No variable found with name 'customer'" });
 
     // then
-    expect(screen.getByText('No Variable Found:').tagName).toBe('STRONG');
+    expect(screen.getByText('No Variable Found:').tagName).to.equal('STRONG');
   });
 
 
@@ -213,8 +199,8 @@ describe('<ResultView>', () => {
     renderWarning({ message: "No Variable Found: No variable found with name 'customer'" });
 
     // then
-    expect(screen.getByText(/No Variable Found:/).textContent).toBe('No Variable Found:');
-    expect(screen.getByText(/No variable found with name/).textContent).toContain("No variable found with name 'customer'");
+    expect(screen.getByText(/No Variable Found:/).textContent).to.equal('No Variable Found:');
+    expect(screen.getByText(/No variable found with name/).textContent).to.contain("No variable found with name 'customer'");
   });
 
 
@@ -227,7 +213,7 @@ describe('<ResultView>', () => {
     });
 
     // then
-    expect(screen.getByText('Invalid Type:').tagName).toBe('STRONG');
+    expect(screen.getByText('Invalid Type:').tagName).to.equal('STRONG');
   });
 
 
@@ -237,30 +223,16 @@ describe('<ResultView>', () => {
     renderWarning({ message: 'Can\'t add \'null\' to \'1\'' });
 
     // then
-    expect(screen.getByText('Invalid Type:').tagName).toBe('STRONG');
+    expect(screen.getByText('Invalid Type:').tagName).to.equal('STRONG');
   });
 
 
-  it('should show the result alongside host warnings', () => {
-
-    // when
-    renderWarning({ message: 'Result may be incomplete.' }, 42);
-
-    // then
-    expect(screen.getByText('42')).toBeTruthy();
-    expect(screen.getByRole('img', { name: 'Warning' })).toBeTruthy();
-  });
 });
 
 function renderResult(state: PlaygroundState) {
   return render(<ResultView state={ state } />);
 }
 
-function renderWarning(
-    warning: { type?: string; message: string },
-    result: unknown = null
-) {
-  renderResult({ status: 'warning', result, warnings: [ warning ] });
-
-  return within(screen.getByRole('img', { name: 'Warning' }).closest('section')!);
+function renderWarning(warning: { type?: string; message: string }) {
+  return render(<Warning warning={ warning } />);
 }

@@ -41,8 +41,8 @@ describe('createPlaygroundController', () => {
     controller.update({ ...VALID_INPUT, expression: '', onEvaluate });
 
     // then
-    expect(controller.getState()).toEqual({ status: 'idle' });
-    expect(onEvaluate).not.toHaveBeenCalled();
+    expect(controller.getState()).to.eql({ status: 'idle' });
+    expect(onEvaluate.mock.calls).to.be.empty;
   });
 
 
@@ -56,8 +56,8 @@ describe('createPlaygroundController', () => {
     controller.update({ ...VALID_INPUT, expressionValid: false, onEvaluate });
 
     // then
-    expect(controller.getState()).toEqual({ status: 'invalid-expression' });
-    expect(onEvaluate).not.toHaveBeenCalled();
+    expect(controller.getState()).to.eql({ status: 'invalid-expression' });
+    expect(onEvaluate.mock.calls).to.be.empty;
   });
 
 
@@ -71,8 +71,8 @@ describe('createPlaygroundController', () => {
     controller.update({ ...VALID_INPUT, expressionValid: null, onEvaluate });
 
     // then
-    expect(controller.getState()).toEqual({ status: 'validating-expression' });
-    expect(onEvaluate).not.toHaveBeenCalled();
+    expect(controller.getState()).to.eql({ status: 'validating-expression' });
+    expect(onEvaluate.mock.calls).to.be.empty;
   });
 
 
@@ -86,8 +86,8 @@ describe('createPlaygroundController', () => {
     controller.update({ ...VALID_INPUT, context: '{', onEvaluate });
 
     // then
-    expect(controller.getState()).toMatchObject({ status: 'invalid-context' });
-    expect(onEvaluate).not.toHaveBeenCalled();
+    expect(controller.getState()).to.include({ status: 'invalid-context' });
+    expect(onEvaluate.mock.calls).to.be.empty;
   });
 
 
@@ -100,7 +100,7 @@ describe('createPlaygroundController', () => {
     controller.update({ ...VALID_INPUT, context: '[]' });
 
     // then
-    expect(controller.getState()).toEqual({
+    expect(controller.getState()).to.eql({
       status: 'invalid-context',
       error: 'Context must be a JSON object.'
     });
@@ -118,10 +118,10 @@ describe('createPlaygroundController', () => {
     await vi.runAllTimersAsync();
 
     // then
-    expect(onEvaluate).toHaveBeenCalledWith(
-      { expression: '1 + 1', context: {}, dialect: 'expression' },
-      { signal: expect.any(AbortSignal) }
-    );
+    const [ input, options ] = onEvaluate.mock.calls[0];
+
+    expect(input).to.eql({ expression: '1 + 1', context: {}, dialect: 'expression' });
+    expect(options.signal).to.be.instanceOf(AbortSignal);
   });
 
 
@@ -134,7 +134,7 @@ describe('createPlaygroundController', () => {
     controller.update(VALID_INPUT);
 
     // then
-    expect(controller.getState()).toEqual({
+    expect(controller.getState()).to.eql({
       status: 'unavailable',
       message: 'Evaluation is unavailable.'
     });
@@ -153,7 +153,7 @@ describe('createPlaygroundController', () => {
     });
 
     // then
-    expect(controller.getState()).toEqual({
+    expect(controller.getState()).to.eql({
       status: 'unavailable',
       message: 'Connect to a cluster to evaluate.'
     });
@@ -170,7 +170,7 @@ describe('createPlaygroundController', () => {
     controller.update({ ...VALID_INPUT, onEvaluate });
 
     // then
-    expect(controller.getState()).toEqual({ status: 'scheduled' });
+    expect(controller.getState()).to.eql({ status: 'scheduled' });
   });
 
 
@@ -185,7 +185,7 @@ describe('createPlaygroundController', () => {
     await vi.advanceTimersByTimeAsync(0);
 
     // then
-    expect(controller.getState()).toEqual({ status: 'loading' });
+    expect(controller.getState()).to.eql({ status: 'loading' });
   });
 
 
@@ -200,7 +200,7 @@ describe('createPlaygroundController', () => {
     await vi.runAllTimersAsync();
 
     // then
-    expect(controller.getState()).toEqual({
+    expect(controller.getState()).to.eql({
       status: 'success',
       result: { total: 2 }
     });
@@ -219,7 +219,7 @@ describe('createPlaygroundController', () => {
     await vi.runAllTimersAsync();
 
     // then
-    expect(controller.getState()).toEqual({
+    expect(controller.getState()).to.eql({
       status: 'warning',
       result: null,
       warnings
@@ -238,7 +238,7 @@ describe('createPlaygroundController', () => {
     await vi.runAllTimersAsync();
 
     // then
-    expect(controller.getState()).toEqual({
+    expect(controller.getState()).to.eql({
       status: 'error',
       error: 'Cluster unavailable.'
     });
@@ -256,7 +256,7 @@ describe('createPlaygroundController', () => {
     await vi.runAllTimersAsync();
 
     // then
-    expect(controller.getState()).toEqual({
+    expect(controller.getState()).to.eql({
       status: 'error',
       error: 'Evaluation failed.'
     });

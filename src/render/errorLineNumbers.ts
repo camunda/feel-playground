@@ -62,11 +62,7 @@ export function createErrorLineNumbers(): {
 }
 
 function createMarkers(document: Text, positions: readonly number[]) {
-  const lineStarts = [
-    ...new Set(positions.map(position => document.lineAt(
-      Math.min(document.length, Math.max(0, position))
-    ).from))
-  ].sort((a, b) => a - b);
+  const lineStarts = getErrorLineStarts(document, positions);
   const markers = new RangeSetBuilder<GutterMarker>();
 
   for (const lineStart of lineStarts) {
@@ -74,4 +70,12 @@ function createMarkers(document: Text, positions: readonly number[]) {
   }
 
   return markers.finish();
+}
+
+export function getErrorLineStarts(document: Text, positions: readonly number[]): number[] {
+  return [
+    ...new Set(positions.map(position => document.lineAt(
+      Math.min(document.length, Math.max(0, position))
+    ).from))
+  ].sort((a, b) => a - b);
 }

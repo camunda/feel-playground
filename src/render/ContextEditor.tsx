@@ -1,19 +1,22 @@
 import { useEffect, useImperativeHandle, useRef, type Ref } from 'react';
 
-import { feelLight } from '@bpmn-io/cm-theme';
 import {
   Button,
   Tooltip,
   TooltipContent,
   TooltipTrigger
 } from '@camunda/design-system';
-import { snippet } from '@codemirror/autocomplete';
-import { json } from '@codemirror/lang-json';
-import { setDiagnostics, type Diagnostic } from '@codemirror/lint';
-import { Compartment, EditorState } from '@codemirror/state';
+import { setDiagnostics } from '@codemirror/lint';
+import { Compartment } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
-import { basicSetup } from 'codemirror';
 
+import {
+  contextEditorAttributes,
+  createContextDiagnostic,
+  createContextEditorState,
+  insertContextTemplate,
+  syncEditorValue
+} from '../core/editorState';
 import { DiagnosticList } from './DiagnosticList';
 import { StatusIcon } from './StatusIcon';
 
@@ -53,27 +56,14 @@ export function ContextEditor({ value, onChange, onReset, error, ref }: ContextE
 
     const editor = new EditorView({
       parent: container,
-      state: EditorState.create({
-        doc: value,
-        extensions: [
-          basicSetup,
-          feelLight,
-          json(),
-          EditorView.lineWrapping,
-          attributesRef.current.of(EditorView.contentAttributes.of({
-            'aria-label': 'Evaluation context',
-            'aria-invalid': String(Boolean(error))
-          })),
-          EditorView.updateListener.of(update => {
-            if (!update.docChanged) {
-              return;
-            }
-
-            const nextValue = update.state.doc.toString();
-            valueRef.current = nextValue;
-            onChangeRef.current(nextValue);
-          })
-        ]
+      state: createContextEditorState({
+        value,
+        error,
+        attributes: attributesRef.current,
+        onChange: nextValue => {
+          valueRef.current = nextValue;
+          onChangeRef.current(nextValue);
+        }
       })
     });
 
@@ -95,7 +85,7 @@ export function ContextEditor({ value, onChange, onReset, error, ref }: ContextE
 
       // the update listener syncs valueRef and notifies the host, so the
       // value effect below will not overwrite the snippet
-      snippet(template)(editor, null, 0, editor.state.doc.length);
+      insertContextTemplate(editor, template);
 
       if (options.focus) {
         editor.focus();
@@ -106,18 +96,11 @@ export function ContextEditor({ value, onChange, onReset, error, ref }: ContextE
   useEffect(() => {
     const editor = editorRef.current;
 
-    if (!editor || valueRef.current === value) {
+    if (!editor) {
       return;
     }
 
-    valueRef.current = value;
-    editor.dispatch({
-      changes: {
-        from: 0,
-        to: editor.state.doc.length,
-        insert: value
-      }
-    });
+    syncEditorValue(editor, valueRef, value);
   }, [ value ]);
 
   useEffect(() => {
@@ -128,20 +111,19 @@ export function ContextEditor({ value, onChange, onReset, error, ref }: ContextE
     }
 
     editor.dispatch({
-      effects: attributesRef.current.reconfigure(EditorView.contentAttributes.of({
-        'aria-label': 'Evaluation context',
-        'aria-invalid': String(Boolean(error))
-      }))
+      effects: attributesRef.current.reconfigure(
+        EditorView.contentAttributes.of(contextEditorAttributes(error))
+      )
     });
 
     editor.dispatch(setDiagnostics(
       editor.state,
-      error ? [ createDiagnostic(error, editor.state.doc.length) ] : []
+      error ? [ createContextDiagnostic(error, editor.state.doc.length) ] : []
     ));
   }, [ error ]);
 
   const diagnostics = error
-    ? [ createDiagnostic(error, value.length) ]
+    ? [ createContextDiagnostic(error, value.length) ]
     : [];
 
   const handleDiagnosticSelect = (position: number) => {
@@ -218,19 +200,4 @@ export function ContextEditor({ value, onChange, onReset, error, ref }: ContextE
       </p>
     </section>
   );
-}
-
-function createDiagnostic(error: string, documentLength: number): Diagnostic {
-  const position = Number(error.match(/position (\d+)/)?.[1]);
-  const from = Number.isFinite(position)
-    ? Math.min(position, documentLength)
-    : 0;
-
-  return {
-    from,
-    to: Math.min(from + 1, documentLength),
-    severity: 'error',
-    source: 'Context error',
-    message: error.replace(/ at position \d+(?: \(line \d+ column \d+\))?$/, '')
-  };
 }

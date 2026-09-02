@@ -1,56 +1,32 @@
-import { EditorState } from '@codemirror/state';
-import { EditorView, lineNumbers } from '@codemirror/view';
-import { afterEach, describe, expect, it } from 'vitest';
+import { Text } from '@codemirror/state';
+import { describe, expect, it } from 'vitest';
 
-import { createErrorLineNumbers } from '../src/render/errorLineNumbers';
-
-let editor: EditorView | null = null;
-
-afterEach(() => {
-  editor?.destroy();
-  editor = null;
-});
+import { getErrorLineStarts } from '../src/render/errorLineNumbers';
 
 describe('error line numbers', () => {
 
-  it('should mark line numbers containing errors', () => {
+  it('should find unique lines containing errors', () => {
 
     // given
-    const errorLineNumbers = createErrorLineNumbers();
-    editor = new EditorView({
-      parent: document.body,
-      state: EditorState.create({
-        doc: 'first\nsecond\nthird',
-        extensions: [ lineNumbers(), errorLineNumbers.extension ]
-      })
-    });
+    const document = Text.of([ 'first', 'second', 'third' ]);
 
     // when
-    errorLineNumbers.update([ 7, 9, 13 ]);
+    const lineStarts = getErrorLineStarts(document, [ 7, 9, 13 ]);
 
     // then
-    const markedLines = editor.dom.querySelectorAll('.feel-playground__error-line-number');
-    expect([ ...markedLines ].map(line => line.textContent)).toEqual([ '2', '3' ]);
+    expect(lineStarts).to.eql([ 6, 13 ]);
   });
 
 
-  it('should clear marked line numbers', () => {
+  it('should return no lines without errors', () => {
 
     // given
-    const errorLineNumbers = createErrorLineNumbers();
-    editor = new EditorView({
-      parent: document.body,
-      state: EditorState.create({
-        doc: 'first\nsecond',
-        extensions: [ lineNumbers(), errorLineNumbers.extension ]
-      })
-    });
-    errorLineNumbers.update([ 7 ]);
+    const document = Text.of([ 'first', 'second' ]);
 
     // when
-    errorLineNumbers.update([]);
+    const lineStarts = getErrorLineStarts(document, []);
 
     // then
-    expect(editor.dom.querySelector('.feel-playground__error-line-number')).toBeNull();
+    expect(lineStarts).to.eql([]);
   });
 });

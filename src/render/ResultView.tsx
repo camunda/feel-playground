@@ -98,13 +98,13 @@ function Status({ status }: { status: PlaygroundState['status'] }) {
   }
 }
 
-function formatResult(result: unknown): string {
+export function formatResult(result: unknown): string {
   const serialized = JSON.stringify(result, null, 2);
 
   return typeof serialized === 'undefined' ? String(result) : serialized;
 }
 
-function Warning({ warning }: { warning: EvaluationWarning }) {
+export function Warning({ warning }: { warning: EvaluationWarning }) {
   const type = getWarningType(warning);
 
   if (!type) {

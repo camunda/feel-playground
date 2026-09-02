@@ -18,7 +18,7 @@ describe('resolveEvaluationContext', () => {
     });
 
     // then
-    expect(context).toEqual({
+    expect(context).to.eql({
       customer: {
         name: null
       }
@@ -38,7 +38,7 @@ describe('resolveEvaluationContext', () => {
     });
 
     // then
-    expect(context).toEqual({
+    expect(context).to.eql({
       customer: {
         id: null,
         name: null
@@ -55,7 +55,7 @@ describe('resolveEvaluationContext', () => {
     });
 
     // then
-    expect(context).toEqual({
+    expect(context).to.eql({
       customer: {
         name: null
       },
@@ -72,7 +72,7 @@ describe('resolveEvaluationContext', () => {
     });
 
     // then
-    expect(context).toEqual({
+    expect(context).to.eql({
       orders: null
     });
   });
@@ -87,7 +87,7 @@ describe('resolveEvaluationContext', () => {
     });
 
     // then
-    expect(context).toEqual({
+    expect(context).to.eql({
       customer: null,
       order: null
     });

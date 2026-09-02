@@ -19,6 +19,7 @@ import {
   type PlaygroundState
 } from '../core/types';
 import { createPlaygroundController } from '../core/createPlaygroundController';
+import { nextEvaluationHeight } from '../core/nextEvaluationHeight';
 import { resolveEvaluationContext } from '../core/resolveEvaluationContext';
 import { toSnippetTemplate } from '../core/snippetTemplate';
 import { ContextEditor, type ContextEditorHandle } from './ContextEditor';
@@ -136,7 +137,7 @@ export function FeelPlayground({
     });
   }, [ expression, expressionValid, context, dialect, onEvaluate, evaluationUnavailable ]);
 
-  const resizeEvaluation = (height: number) => {
+  const resizeEvaluation = (startHeight: number, moved = true) => {
     const container = containerRef.current;
 
     if (!container) {
@@ -149,7 +150,13 @@ export function FeelPlayground({
       container.getBoundingClientRect().height - SPLITTER_HEIGHT - MIN_EXPRESSION_HEIGHT
     );
 
-    setEvaluationHeight(Math.min(maximum, Math.max(minimum, height)));
+    setEvaluationHeight(nextEvaluationHeight({
+      startHeight,
+      minimum,
+      maximum,
+      openHeight: openEvaluationHeightRef.current,
+      moved
+    }));
   };
 
   const handleResizeStart = (event: PointerEvent<HTMLDivElement>) => {
@@ -202,12 +209,11 @@ export function FeelPlayground({
     const minimum = getCollapsedEvaluationHeight(evaluation);
 
     if (!resize.moved) {
-      if (resize.startHeight <= minimum) {
-        resizeEvaluation(openEvaluationHeightRef.current || minimum);
-      } else {
+      if (resize.startHeight > minimum) {
         openEvaluationHeightRef.current = resize.startHeight;
-        resizeEvaluation(minimum);
       }
+
+      resizeEvaluation(resize.startHeight, false);
     } else if (evaluation.getBoundingClientRect().height > minimum) {
       openEvaluationHeightRef.current = evaluation.getBoundingClientRect().height;
     }
