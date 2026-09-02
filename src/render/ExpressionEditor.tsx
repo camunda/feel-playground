@@ -91,6 +91,7 @@ export const ExpressionEditor = forwardRef<ExpressionEditorHandle, ExpressionEdi
     });
 
     editorRef.current = editor;
+    editor.focus(value.length);
 
     return () => {
       editorRef.current = null;
