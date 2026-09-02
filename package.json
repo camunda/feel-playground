@@ -13,12 +13,13 @@
     "./style.css": "./dist/style.css"
   },
   "scripts": {
-    "all": "npm run lint && npm test && npm run build",
+    "all": "npm run lint && npm test && npm run build && npm run test:distro",
     "start": "vite",
     "build": "npm run typecheck && vite build --config vite.lib.config.ts",
     "prepare": "npm run build",
     "lint": "eslint .",
     "test": "vitest run --config vite.test.config.ts",
+    "test:distro": "node --test test/distro/distro.mjs",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
@@ -47,6 +48,7 @@
     "@typescript-eslint/eslint-plugin": "^8.69.0",
     "@typescript-eslint/parser": "^8.69.0",
     "@vitejs/plugin-react": "^5.2.0",
+    "es-module-lexer": "^2.3.2",
     "eslint": "^9.39.5",
     "eslint-plugin-bpmn-io": "^2.3.1",
     "jsdom": "^30.0.1",
