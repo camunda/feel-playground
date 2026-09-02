@@ -1,0 +1,111 @@
+:root {
+  color: #161616;
+  background: #fff;
+  font-family: "IBM Plex Sans", "Helvetica Neue", sans-serif;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #fff;
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+.app-shell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 40px 0 64px;
+}
+
+.app-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.app-header h1 {
+  margin: 4px 0 0;
+  font-size: clamp(30px, 5vw, 52px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.app-playground-window {
+  height: min(640px, calc(100vh - 280px));
+  min-height: 480px;
+  margin-top: 24px;
+  overflow: hidden;
+  border: 1px solid #c6c6c6;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 12%);
+}
+
+.preview-switcher {
+  padding: 16px 0 0;
+}
+
+.preview-switcher__controls {
+  display: flex;
+  gap: 1px;
+  overflow-x: auto;
+  padding-bottom: 1px;
+  background: #e0e0e0;
+  border: 1px solid #e0e0e0;
+}
+
+.preview-switcher button {
+  flex: 1 0 auto;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 0;
+  color: #393939;
+  background: #f4f4f4;
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.preview-switcher button:hover {
+  background: #e8e8e8;
+}
+
+.preview-switcher button:focus-visible {
+  position: relative;
+  outline: 2px solid #0f62fe;
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+.preview-switcher button.is-active {
+  color: #fff;
+  background: #161616;
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    width: min(100% - 20px, 1120px);
+    padding-top: 24px;
+  }
+
+  .app-header {
+    align-items: flex-start;
+  }
+
+  .app-playground-window {
+    height: calc(100vh - 240px);
+    min-height: 420px;
+  }
+
+}
