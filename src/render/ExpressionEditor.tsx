@@ -8,7 +8,7 @@ import {
 import FeelEditor from '@bpmn-io/feel-editor';
 import { lineNumbers } from '@codemirror/view';
 
-import type { FeelDialect } from '../core/types';
+import type { FeelDialect, FeelEngines } from '../core/types';
 import type { PlaygroundDiagnostic } from './DiagnosticList';
 import { createErrorLineNumbers } from './errorLineNumbers';
 
@@ -32,6 +32,7 @@ interface ExpressionEditorProps {
   onErrorsChange(errors: FeelLintReport[]): void;
   dialect: FeelDialect;
   variables: FeelVariable[];
+  engines?: FeelEngines;
 }
 
 export const ExpressionEditor = forwardRef<ExpressionEditorHandle, ExpressionEditorProps>(function ExpressionEditor({
@@ -40,7 +41,8 @@ export const ExpressionEditor = forwardRef<ExpressionEditorHandle, ExpressionEdi
   onValidityChange,
   onErrorsChange,
   dialect,
-  variables
+  variables,
+  engines
 }, ref) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<FeelEditor | null>(null);
@@ -73,6 +75,7 @@ export const ExpressionEditor = forwardRef<ExpressionEditorHandle, ExpressionEdi
         'aria-label': 'FEEL expression'
       },
       dialect,
+      engines,
       extensions: [ lineNumbers(), errorLineNumbers.extension ],
       onChange: nextValue => {
         valueRef.current = nextValue;
@@ -111,6 +114,10 @@ export const ExpressionEditor = forwardRef<ExpressionEditorHandle, ExpressionEdi
   useEffect(() => {
     editorRef.current?.setVariables(variables);
   }, [ variables ]);
+
+  useEffect(() => {
+    editorRef.current?.setEngines(engines);
+  }, [ engines ]);
 
   return <div className="feel-playground__expression-editor" ref={ containerRef } />;
 });

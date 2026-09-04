@@ -259,6 +259,7 @@ export function FeelPlayground({
               onErrorsChange={ setExpressionErrors }
               dialect={ dialect }
               variables={ variables }
+              engines={ feelLanguageContext?.engines }
             />
           </section>
 

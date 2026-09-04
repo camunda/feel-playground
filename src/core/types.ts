@@ -2,6 +2,8 @@ export type EvaluationContext = Record<string, unknown>;
 
 export type FeelDialect = 'expression' | 'unaryTests';
 
+export type FeelEngines = Record<string, string>;
+
 export interface FeelBuiltin {
   name: string;
   type?: 'function';
@@ -14,6 +16,7 @@ export interface FeelLanguageContext {
   reservedNameBuiltins?: FeelBuiltin[];
   dialect?: FeelDialect;
   parserDialect?: 'camunda';
+  engines?: FeelEngines;
 }
 
 export interface EvaluationWarning {
