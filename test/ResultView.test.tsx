@@ -107,7 +107,7 @@ describe('<ResultView>', () => {
   });
 
 
-  it('should show host unavailability as a warning', () => {
+  it('should show host unavailability as an error', () => {
 
     // when
     renderResult({ status: 'unavailable', message: 'Connect to a cluster.' });
@@ -159,14 +159,14 @@ describe('<ResultView>', () => {
   });
 
 
-  it('should show a generic host warning unchanged', () => {
+  it('should show an unrecognized host warning as an error', () => {
 
     // when
     renderWarning({ message: 'Result may be incomplete.' });
 
     // then
-    const warning = screen.getByText('Result may be incomplete.');
-    expect(warning.querySelector('strong')).not.to.exist;
+    expect(screen.getByText('Error:').tagName).to.equal('STRONG');
+    expect(screen.getByText(/Result may be incomplete/)).to.exist;
   });
 
 
@@ -224,6 +224,68 @@ describe('<ResultView>', () => {
 
     // then
     expect(screen.getByText('Invalid Type:').tagName).to.equal('STRONG');
+  });
+
+
+  it('should format all FEEL warning types provided by the host', () => {
+
+    // given
+    const warnings = [
+      [ 'UNKNOWN', 'Unknown:' ],
+      [ 'NO_VARIABLE_FOUND', 'No Variable Found:' ],
+      [ 'NO_CONTEXT_ENTRY_FOUND', 'No Context Entry Found:' ],
+      [ 'NO_PROPERTY_FOUND', 'No Property Found:' ],
+      [ 'NOT_COMPARABLE', 'Not Comparable:' ],
+      [ 'INVALID_TYPE', 'Invalid Type:' ],
+      [ 'NO_FUNCTION_FOUND', 'No Function Found:' ],
+      [ 'FUNCTION_INVOCATION_FAILURE', 'Function Invocation Failure:' ],
+      [ 'ASSERT_FAILURE', 'Assert Failure:' ]
+    ];
+
+    // when
+    render(
+      <>
+        {warnings.map(([ type ], index) => (
+          <Warning key={ type } warning={ { type, message: `Warning ${index}` } } />
+        ))}
+      </>
+    );
+
+    // then
+    warnings.forEach((warning) => {
+      expect(screen.getByText(warning[1]).tagName).to.equal('STRONG');
+    });
+  });
+
+
+  it('should infer all recognizable FEEL warning types from messages', () => {
+
+    // given
+    const warnings = [
+      [ 'Unsupported expression', 'Unknown:' ],
+      [ "No variable found with name 'x'", 'No Variable Found:' ],
+      [ "No context entry found with key 'x'", 'No Context Entry Found:' ],
+      [ "No property found with name 'x'", 'No Property Found:' ],
+      [ "Can't compare 'true' with '2'", 'Not Comparable:' ],
+      [ "Can't subtract 'true' from '2'", 'Invalid Type:' ],
+      [ "No function found with name 'missing'", 'No Function Found:' ],
+      [ "Failed to invoke function 'date': invalid argument", 'Function Invocation Failure:' ],
+      [ 'The condition is not fulfilled', 'Assert Failure:' ]
+    ];
+
+    // when
+    render(
+      <>
+        {warnings.map(([ message ]) => (
+          <Warning key={ message } warning={ { message } } />
+        ))}
+      </>
+    );
+
+    // then
+    warnings.forEach((warning) => {
+      expect(screen.getByText(warning[1]).tagName).to.equal('STRONG');
+    });
   });
 
 

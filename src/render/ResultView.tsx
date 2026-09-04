@@ -108,7 +108,11 @@ export function Warning({ warning }: { warning: EvaluationWarning }) {
   const type = getWarningType(warning);
 
   if (!type) {
-    return <p>{warning.message}</p>;
+    return (
+      <p>
+        <strong>Error:</strong> {warning.message}
+      </p>
+    );
   }
 
   const message = warning.message.replace(new RegExp(`^${type}:\\s*`, 'i'), '');
@@ -120,14 +124,60 @@ export function Warning({ warning }: { warning: EvaluationWarning }) {
   );
 }
 
-function getWarningType(warning: EvaluationWarning): 'No Variable Found' | 'Invalid Type' | undefined {
-  const type = warning.type?.toLowerCase().replaceAll('_', ' ');
+const WARNING_TYPES = {
+  UNKNOWN: 'Unknown',
+  NO_VARIABLE_FOUND: 'No Variable Found',
+  NO_CONTEXT_ENTRY_FOUND: 'No Context Entry Found',
+  NO_PROPERTY_FOUND: 'No Property Found',
+  NOT_COMPARABLE: 'Not Comparable',
+  INVALID_TYPE: 'Invalid Type',
+  NO_FUNCTION_FOUND: 'No Function Found',
+  FUNCTION_INVOCATION_FAILURE: 'Function Invocation Failure',
+  ASSERT_FAILURE: 'Assert Failure'
+} as const;
 
-  if (type === 'no variable found' || /^no variable found\b/i.test(warning.message)) {
+type WarningType = typeof WARNING_TYPES[keyof typeof WARNING_TYPES];
+
+function getWarningType(warning: EvaluationWarning): WarningType | undefined {
+  const type = warning.type?.trim().toUpperCase() as keyof typeof WARNING_TYPES | undefined;
+
+  if (type && type in WARNING_TYPES) {
+    return WARNING_TYPES[type];
+  }
+
+  if (/^no variable found\b/i.test(warning.message)) {
     return 'No Variable Found';
   }
 
-  if (type === 'invalid type' || /^(invalid type:|can't add\b)/i.test(warning.message)) {
+  if (/^no context entry found\b/i.test(warning.message)) {
+    return 'No Context Entry Found';
+  }
+
+  if (/^no property found\b/i.test(warning.message)) {
+    return 'No Property Found';
+  }
+
+  if (/^can't compare\b/i.test(warning.message)) {
+    return 'Not Comparable';
+  }
+
+  if (/^(invalid type:|can't (?:add|subtract|multiply|divide)\b|expected .+ but found\b|invalid range definition\b)/i.test(warning.message)) {
     return 'Invalid Type';
+  }
+
+  if (/^no function found\b/i.test(warning.message)) {
+    return 'No Function Found';
+  }
+
+  if (/^failed to (?:invoke function|load class|get method|invoke method)\b/i.test(warning.message)) {
+    return 'Function Invocation Failure';
+  }
+
+  if (/^(the condition is not fulfilled|assert(?:ion)? failed\b)/i.test(warning.message)) {
+    return 'Assert Failure';
+  }
+
+  if (/^unsupported expression\b/i.test(warning.message)) {
+    return 'Unknown';
   }
 }
