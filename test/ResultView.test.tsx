@@ -114,7 +114,7 @@ describe('<ResultView>', () => {
 
     // then
     expect(screen.getByText('Connect to a cluster.')).to.exist;
-    expect(screen.getByRole('img', { name: 'Warning' })).to.exist;
+    expect(screen.getByRole('img', { name: 'Error' })).to.exist;
   });
 
 

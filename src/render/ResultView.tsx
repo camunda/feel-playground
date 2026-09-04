@@ -90,7 +90,7 @@ function Status({ status }: { status: PlaygroundState['status'] }) {
   case 'loading':
     return <StatusIcon status="loading" />;
   case 'unavailable':
-    return <StatusIcon status="warning" />;
+    return <StatusIcon status="error" />;
   case 'success':
   case 'warning':
   case 'error':
