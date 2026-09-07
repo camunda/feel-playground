@@ -1,7 +1,8 @@
 import {
   cleanup,
   render,
-  screen
+  screen,
+  within
 } from '@testing-library/react';
 import {
   afterEach,
@@ -13,8 +14,7 @@ import {
 import type { PlaygroundState } from '../src/core/types';
 import {
   formatResult,
-  ResultView,
-  Warning
+  ResultView
 } from '../src/render/ResultView';
 
 afterEach(cleanup);
@@ -27,7 +27,10 @@ describe('<ResultView>', () => {
     renderResult({ status: 'idle' });
 
     // then
-    expect(screen.getByText('Enter an expression to evaluate.')).to.exist;
+    const emptyState = screen.getByText('Write an expression to see the result');
+
+    expect(emptyState.className).to.contain('feel-playground__result-empty');
+    expect(screen.queryByRole('img')).not.to.exist;
   });
 
 
@@ -37,7 +40,8 @@ describe('<ResultView>', () => {
     renderResult({ status: 'invalid-expression' });
 
     // then
-    expect(screen.getByText('Fix the errors in your FEEL expression to evaluate it.')).to.exist;
+    expect(screen.getByText('Fix the errors in your FEEL expression to evaluate it.').className)
+      .to.contain('feel-playground__result-empty');
     expect(screen.queryByRole('img')).not.to.exist;
   });
 
@@ -48,7 +52,7 @@ describe('<ResultView>', () => {
     renderResult({ status: 'validating-expression' });
 
     // then
-    expect(screen.getByText('Evaluating…')).to.exist;
+    expect(screen.getByRole('status', { name: 'Loading result' })).to.exist;
     expect(screen.getByRole('img', { name: 'Loading' })).to.exist;
   });
 
@@ -59,7 +63,8 @@ describe('<ResultView>', () => {
     renderResult({ status: 'invalid-context', error: 'Invalid JSON' });
 
     // then
-    expect(screen.getByText('Fix the errors in your context to evaluate the expression.')).to.exist;
+    expect(screen.getByText('Fix the errors in your context to evaluate the expression.').className)
+      .to.contain('feel-playground__result-empty');
     expect(screen.queryByRole('img')).not.to.exist;
   });
 
@@ -91,7 +96,8 @@ describe('<ResultView>', () => {
     renderResult({ status: 'scheduled' });
 
     // then
-    expect(screen.getByText('Evaluating…')).to.exist;
+    expect(screen.getByRole('status', { name: 'Loading result' })).to.exist;
+    expect(document.querySelectorAll('[data-slot="skeleton"]')).to.have.length(3);
     expect(screen.getByRole('img', { name: 'Loading' })).to.exist;
   });
 
@@ -102,8 +108,23 @@ describe('<ResultView>', () => {
     renderResult({ status: 'loading' });
 
     // then
-    expect(screen.getByText('Evaluating…')).to.exist;
+    expect(screen.getByRole('status', { name: 'Loading result' })).to.exist;
     expect(screen.getByRole('img', { name: 'Loading' })).to.exist;
+  });
+
+
+  it('should retain the previous result while re-evaluating', () => {
+
+    // when
+    const { container } = renderResult({
+      status: 'loading',
+      previousResult: { total: 2 }
+    });
+
+    // then
+    expect(container.querySelector('.feel-playground__result-previous')).to.exist;
+    expect(container.querySelector('.feel-playground__result-editor')).to.exist;
+    expect(screen.queryByRole('status', { name: 'Loading result' })).not.to.exist;
   });
 
 
@@ -113,7 +134,8 @@ describe('<ResultView>', () => {
     renderResult({ status: 'unavailable', message: 'Connect to a cluster.' });
 
     // then
-    expect(screen.getByText('Connect to a cluster.')).to.exist;
+    expect(screen.getByText('Connect to a cluster.').className)
+      .to.contain('feel-playground__result-empty');
     expect(screen.getByRole('img', { name: 'Error' })).to.exist;
   });
 
@@ -154,7 +176,8 @@ describe('<ResultView>', () => {
     renderResult({ status: 'error', error: 'Request failed.' });
 
     // then
-    expect(screen.getByText('Request failed.')).to.exist;
+    expect(screen.getByText('Request failed.').className)
+      .to.contain('feel-playground__result-empty');
     expect(screen.getByRole('img', { name: 'Error' })).to.exist;
   });
 
@@ -165,8 +188,12 @@ describe('<ResultView>', () => {
     renderWarning({ message: 'Result may be incomplete.' });
 
     // then
-    expect(screen.getByText('Error:').tagName).to.equal('STRONG');
+    expect(screen.getByText('Error.').tagName).to.equal('STRONG');
     expect(screen.getByText(/Result may be incomplete/)).to.exist;
+    const diagnostics = screen.getByLabelText('Expression diagnostics');
+
+    expect(within(diagnostics).getByRole('img', { name: 'Warning' })).to.exist;
+    expect(within(diagnostics).queryByRole('button')).not.to.exist;
   });
 
 
@@ -179,7 +206,7 @@ describe('<ResultView>', () => {
     });
 
     // then
-    expect(screen.getByText('No Variable Found:').tagName).to.equal('STRONG');
+    expect(screen.getByText('No Variable Found.').tagName).to.equal('STRONG');
   });
 
 
@@ -189,7 +216,7 @@ describe('<ResultView>', () => {
     renderWarning({ message: "No variable found with name 'customer'" });
 
     // then
-    expect(screen.getByText('No Variable Found:').tagName).to.equal('STRONG');
+    expect(screen.getByText('No Variable Found.').tagName).to.equal('STRONG');
   });
 
 
@@ -199,7 +226,7 @@ describe('<ResultView>', () => {
     renderWarning({ message: "No Variable Found: No variable found with name 'customer'" });
 
     // then
-    expect(screen.getByText(/No Variable Found:/).textContent).to.equal('No Variable Found:');
+    expect(screen.getByText(/No Variable Found\./).textContent).to.equal('No Variable Found.');
     expect(screen.getByText(/No variable found with name/).textContent).to.contain("No variable found with name 'customer'");
   });
 
@@ -213,7 +240,7 @@ describe('<ResultView>', () => {
     });
 
     // then
-    expect(screen.getByText('Invalid Type:').tagName).to.equal('STRONG');
+    expect(screen.getByText('Invalid Type.').tagName).to.equal('STRONG');
   });
 
 
@@ -223,7 +250,7 @@ describe('<ResultView>', () => {
     renderWarning({ message: 'Can\'t add \'null\' to \'1\'' });
 
     // then
-    expect(screen.getByText('Invalid Type:').tagName).to.equal('STRONG');
+    expect(screen.getByText('Invalid Type.').tagName).to.equal('STRONG');
   });
 
 
@@ -231,22 +258,25 @@ describe('<ResultView>', () => {
 
     // given
     const warnings = [
-      [ 'UNKNOWN', 'Unknown:' ],
-      [ 'NO_VARIABLE_FOUND', 'No Variable Found:' ],
-      [ 'NO_CONTEXT_ENTRY_FOUND', 'No Context Entry Found:' ],
-      [ 'NO_PROPERTY_FOUND', 'No Property Found:' ],
-      [ 'NOT_COMPARABLE', 'Not Comparable:' ],
-      [ 'INVALID_TYPE', 'Invalid Type:' ],
-      [ 'NO_FUNCTION_FOUND', 'No Function Found:' ],
-      [ 'FUNCTION_INVOCATION_FAILURE', 'Function Invocation Failure:' ],
-      [ 'ASSERT_FAILURE', 'Assert Failure:' ]
+      [ 'UNKNOWN', 'Unknown.' ],
+      [ 'NO_VARIABLE_FOUND', 'No Variable Found.' ],
+      [ 'NO_CONTEXT_ENTRY_FOUND', 'No Context Entry Found.' ],
+      [ 'NO_PROPERTY_FOUND', 'No Property Found.' ],
+      [ 'NOT_COMPARABLE', 'Not Comparable.' ],
+      [ 'INVALID_TYPE', 'Invalid Type.' ],
+      [ 'NO_FUNCTION_FOUND', 'No Function Found.' ],
+      [ 'FUNCTION_INVOCATION_FAILURE', 'Function Invocation Failure.' ],
+      [ 'ASSERT_FAILURE', 'Assert Failure.' ]
     ];
 
     // when
     render(
       <>
         {warnings.map(([ type ], index) => (
-          <Warning key={ type } warning={ { type, message: `Warning ${index}` } } />
+          <ResultView
+            key={ type }
+            state={ { status: 'warning', result: null, warnings: [ { type, message: `Warning ${index}` } ] } }
+          />
         ))}
       </>
     );
@@ -262,22 +292,25 @@ describe('<ResultView>', () => {
 
     // given
     const warnings = [
-      [ 'Unsupported expression', 'Unknown:' ],
-      [ "No variable found with name 'x'", 'No Variable Found:' ],
-      [ "No context entry found with key 'x'", 'No Context Entry Found:' ],
-      [ "No property found with name 'x'", 'No Property Found:' ],
-      [ "Can't compare 'true' with '2'", 'Not Comparable:' ],
-      [ "Can't subtract 'true' from '2'", 'Invalid Type:' ],
-      [ "No function found with name 'missing'", 'No Function Found:' ],
-      [ "Failed to invoke function 'date': invalid argument", 'Function Invocation Failure:' ],
-      [ 'The condition is not fulfilled', 'Assert Failure:' ]
+      [ 'Unsupported expression', 'Unknown.' ],
+      [ "No variable found with name 'x'", 'No Variable Found.' ],
+      [ "No context entry found with key 'x'", 'No Context Entry Found.' ],
+      [ "No property found with name 'x'", 'No Property Found.' ],
+      [ "Can't compare 'true' with '2'", 'Not Comparable.' ],
+      [ "Can't subtract 'true' from '2'", 'Invalid Type.' ],
+      [ "No function found with name 'missing'", 'No Function Found.' ],
+      [ "Failed to invoke function 'date': invalid argument", 'Function Invocation Failure.' ],
+      [ 'The condition is not fulfilled', 'Assert Failure.' ]
     ];
 
     // when
     render(
       <>
         {warnings.map(([ message ]) => (
-          <Warning key={ message } warning={ { message } } />
+          <ResultView
+            key={ message }
+            state={ { status: 'warning', result: null, warnings: [ { message } ] } }
+          />
         ))}
       </>
     );
@@ -296,5 +329,7 @@ function renderResult(state: PlaygroundState) {
 }
 
 function renderWarning(warning: { type?: string; message: string }) {
-  return render(<Warning warning={ warning } />);
+  return render(
+    <ResultView state={ { status: 'warning', result: null, warnings: [ warning ] } } />
+  );
 }

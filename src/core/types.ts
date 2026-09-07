@@ -63,12 +63,12 @@ export interface PlaygroundInput {
 
 export type PlaygroundState =
   | { status: 'idle' }
-  | { status: 'validating-expression' }
+  | { status: 'validating-expression'; previousResult?: unknown }
   | { status: 'invalid-expression' }
   | { status: 'invalid-context'; error: string }
   | { status: 'unavailable'; message: string }
-  | { status: 'scheduled' }
-  | { status: 'loading' }
+  | { status: 'scheduled'; previousResult?: unknown }
+  | { status: 'loading'; previousResult?: unknown }
   | { status: 'success'; result: unknown }
   | { status: 'warning'; result: unknown; warnings: EvaluationWarning[] }
   | { status: 'error'; error: string };

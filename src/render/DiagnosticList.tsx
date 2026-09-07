@@ -4,6 +4,7 @@ import { StatusIcon } from './StatusIcon';
 
 export interface PlaygroundDiagnostic extends Diagnostic {
   type?: string;
+  showPosition?: boolean;
 }
 
 interface DiagnosticListProps {
@@ -27,22 +28,41 @@ export function DiagnosticList({
     <div className="feel-playground__diagnostics" aria-label={ label }>
       {diagnostics.map((diagnostic, index) => {
         const position = getPosition(value, diagnostic.from);
-
-        return (
-          <button
-            className="feel-playground__diagnostic"
-            key={ `${diagnostic.from}-${diagnostic.to}-${index}` }
-            type="button"
-            onClick={ () => onSelect?.(diagnostic.from) }
-          >
-            <StatusIcon status="error" />
-            <span className="feel-playground__diagnostic-position">
-              {position.line}:{position.column}
-            </span>
+        const showPosition = diagnostic.showPosition !== false;
+        const content = (
+          <>
+            <StatusIcon status={ diagnostic.severity === 'warning' ? 'warning' : 'error' } />
+            {showPosition && (
+              <span className="feel-playground__diagnostic-position">
+                {position.line}:{position.column}
+              </span>
+            )}
             <span className="feel-playground__diagnostic-message">
               <strong>{getDiagnosticLabel(diagnostic)}</strong>{' '}
               {diagnostic.message}
             </span>
+          </>
+        );
+
+        if (!showPosition) {
+          return (
+            <div
+              className="feel-playground__diagnostic feel-playground__diagnostic--without-position"
+              key={ `${diagnostic.from}-${diagnostic.to}-${index}` }
+            >
+              {content}
+            </div>
+          );
+        }
+
+        return (
+          <button
+            className="feel-playground__diagnostic feel-playground__diagnostic--action"
+            key={ `${diagnostic.from}-${diagnostic.to}-${index}` }
+            type="button"
+            onClick={ () => onSelect?.(diagnostic.from) }
+          >
+            {content}
           </button>
         );
       })}

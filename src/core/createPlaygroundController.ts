@@ -22,6 +22,8 @@ export function createPlaygroundController(
   let timer: ReturnType<typeof setTimeout> | null = null;
   let request: AbortController | null = null;
   let revision = 0;
+  let hasResult = false;
+  let previousResult: unknown;
   const listeners = new Set<(state: PlaygroundState) => void>();
 
   function getState(): PlaygroundState {
@@ -62,12 +64,14 @@ export function createPlaygroundController(
     }
 
     if (!expression) {
+      hasResult = false;
+      previousResult = undefined;
       setState(INITIAL_STATE);
       return;
     }
 
     if (input.expressionValid === null) {
-      setState({ status: 'validating-expression' });
+      setLoadingState('validating-expression');
       return;
     }
 
@@ -84,7 +88,7 @@ export function createPlaygroundController(
       return;
     }
 
-    setState({ status: 'scheduled' });
+    setLoadingState('scheduled');
 
     const scheduledRevision = revision;
     timer = setTimeout(() => runEvaluation(expression, context, scheduledRevision), debounce);
@@ -105,7 +109,7 @@ export function createPlaygroundController(
     const controller = new AbortController();
     request = controller;
 
-    setState({ status: 'loading' });
+    setLoadingState('loading');
 
     try {
       const result = await evaluate(
@@ -116,6 +120,9 @@ export function createPlaygroundController(
       if (controller.signal.aborted || scheduledRevision !== revision) {
         return;
       }
+
+      hasResult = true;
+      previousResult = result.result;
 
       setState(result.warnings.length
         ? { status: 'warning', result: result.result, warnings: result.warnings }
@@ -159,6 +166,10 @@ export function createPlaygroundController(
   function setState(nextState: PlaygroundState): void {
     state = nextState;
     listeners.forEach(listener => listener(state));
+  }
+
+  function setLoadingState(status: 'validating-expression' | 'scheduled' | 'loading'): void {
+    setState(hasResult ? { status, previousResult } : { status });
   }
 
   return {

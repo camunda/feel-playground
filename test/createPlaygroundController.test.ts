@@ -207,6 +207,29 @@ describe('createPlaygroundController', () => {
   });
 
 
+  it('should retain the previous result while re-evaluating', async () => {
+
+    // given
+    const onEvaluate = vi.fn()
+      .mockResolvedValueOnce({ result: { total: 2 }, warnings: [] })
+      .mockImplementationOnce(() => new Promise<never>(() => {}));
+    const controller = createPlaygroundController({ debounce: 0 });
+
+    controller.update({ ...VALID_INPUT, onEvaluate });
+    await vi.runAllTimersAsync();
+
+    // when
+    controller.update({ ...VALID_INPUT, expression: '1 + 2', onEvaluate });
+    await vi.advanceTimersByTimeAsync(0);
+
+    // then
+    expect(controller.getState()).to.eql({
+      status: 'loading',
+      previousResult: { total: 2 }
+    });
+  });
+
+
   it('should show warnings returned by the host', async () => {
 
     // given

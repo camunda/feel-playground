@@ -2,6 +2,7 @@ import type {
   EvaluationWarning,
   PlaygroundState
 } from '../core/types';
+import { Skeleton } from '@camunda/design-system';
 import {
   DiagnosticList,
   type PlaygroundDiagnostic
@@ -22,6 +23,11 @@ export function ResultView({
   expressionErrors = [],
   onSelectExpressionError
 }: ResultViewProps) {
+  const evaluationWarnings = state.status === 'warning'
+    ? state.warnings.map(toWarningDiagnostic)
+    : [];
+  const diagnostics = [ ...expressionErrors, ...evaluationWarnings ];
+
   return (
     <section className="feel-playground__section feel-playground__result" aria-live="polite">
       <div className="feel-playground__section-heading">
@@ -30,25 +36,18 @@ export function ResultView({
       </div>
 
       <div className="feel-playground__result-body">
-        {state.status === 'warning' && (
-          <div className="feel-playground__warnings">
-            {state.warnings.map((warning, index) => (
-              <Warning key={ index } warning={ warning } />
-            ))}
-          </div>
-        )}
         <Result state={ state } expressionErrors={ expressionErrors } />
       </div>
 
       <DiagnosticList
-        diagnostics={ expressionErrors }
-        label="Expression errors"
+        diagnostics={ diagnostics }
+        label="Expression diagnostics"
         value={ expression }
         onSelect={ onSelectExpressionError }
       />
 
       <p className="feel-playground__pane-hint">
-        Updates when the expression or context changes.
+        Evaluates on the connected Camunda instance when the expression changes.
       </p>
     </section>
   );
@@ -57,26 +56,52 @@ export function ResultView({
 function Result({ state, expressionErrors = [] }: ResultViewProps) {
   switch (state.status) {
   case 'idle':
-    return <p>Enter an expression to evaluate.</p>;
+    return (
+      <div className="feel-playground__result-empty">
+        Write an expression to see the result
+      </div>
+    );
   case 'validating-expression':
-    return <p>Evaluating…</p>;
+    return <LoadingResult state={ state } />;
   case 'invalid-expression':
-    return <p>Fix the errors in your FEEL expression to evaluate it.</p>;
+    return <ResultMessage>Fix the errors in your FEEL expression to evaluate it.</ResultMessage>;
   case 'invalid-context':
     return expressionErrors.length
-      ? <p>Fix the errors in your FEEL expression to evaluate it.</p>
-      : <p>Fix the errors in your context to evaluate the expression.</p>;
+      ? <ResultMessage>Fix the errors in your FEEL expression to evaluate it.</ResultMessage>
+      : <ResultMessage>Fix the errors in your context to evaluate the expression.</ResultMessage>;
   case 'scheduled':
   case 'loading':
-    return <p>Evaluating…</p>;
+    return <LoadingResult state={ state } />;
   case 'unavailable':
-    return <p>{state.message}</p>;
+    return <ResultMessage>{state.message}</ResultMessage>;
   case 'error':
-    return <p>{state.error}</p>;
+    return <ResultMessage>{state.error}</ResultMessage>;
   case 'success':
   case 'warning':
     return <ResultEditor value={ formatResult(state.result) } />;
   }
+}
+
+function ResultMessage({ children }: { children: React.ReactNode }) {
+  return <div className="feel-playground__result-empty">{children}</div>;
+}
+
+function LoadingResult({ state }: { state: Extract<PlaygroundState, { status: 'validating-expression' | 'scheduled' | 'loading' }> }) {
+  if ('previousResult' in state) {
+    return (
+      <div className="feel-playground__result-previous">
+        <ResultEditor value={ formatResult(state.previousResult) } />
+      </div>
+    );
+  }
+
+  return (
+    <div className="feel-playground__result-skeleton" aria-label="Loading result" role="status">
+      <Skeleton className="feel-playground__result-skeleton-line" />
+      <Skeleton className="feel-playground__result-skeleton-line feel-playground__result-skeleton-line--value" />
+      <Skeleton className="feel-playground__result-skeleton-line" />
+    </div>
+  );
 }
 
 function Status({ status }: { status: PlaygroundState['status'] }) {
@@ -104,24 +129,31 @@ export function formatResult(result: unknown): string {
   return typeof serialized === 'undefined' ? String(result) : serialized;
 }
 
-export function Warning({ warning }: { warning: EvaluationWarning }) {
+export function toWarningDiagnostic(warning: EvaluationWarning): PlaygroundDiagnostic {
   const type = getWarningType(warning);
+  const position = warning.position;
 
   if (!type) {
-    return (
-      <p>
-        <strong>Error:</strong> {warning.message}
-      </p>
-    );
+    return {
+      from: position?.from || 0,
+      to: position?.to || position?.from || 0,
+      message: warning.message,
+      severity: 'warning',
+      showPosition: Boolean(position),
+      source: 'Error'
+    };
   }
 
   const message = warning.message.replace(new RegExp(`^${type}:\\s*`, 'i'), '');
 
-  return (
-    <p>
-      <strong>{type}:</strong>{message && ` ${message}`}
-    </p>
-  );
+  return {
+    from: position?.from || 0,
+    to: position?.to || position?.from || 0,
+    message,
+    severity: 'warning',
+    showPosition: Boolean(position),
+    source: type
+  };
 }
 
 const WARNING_TYPES = {
