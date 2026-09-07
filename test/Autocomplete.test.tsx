@@ -42,7 +42,7 @@ describe('autocomplete', () => {
     );
 
     const expression = container.querySelector<HTMLElement>('[aria-label="FEEL expression"]')!;
-    const editor = EditorView.findFromDOM(expression);
+    const editor = EditorView.findFromDOM(expression)!;
 
     // when
     await act(() => user.type(expression, 'cust'));
@@ -63,7 +63,7 @@ describe('autocomplete', () => {
     rerender(createEditor([ { name: 'customer' } ]));
 
     const expression = container.querySelector<HTMLElement>('[aria-label="FEEL expression"]')!;
-    const editor = EditorView.findFromDOM(expression);
+    const editor = EditorView.findFromDOM(expression)!;
 
     // when
     await act(() => user.type(expression, 'cust'));

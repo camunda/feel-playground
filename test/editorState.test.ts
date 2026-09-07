@@ -1,6 +1,10 @@
 import { nextSnippetField } from '@codemirror/autocomplete';
 import { forEachDiagnostic } from '@codemirror/lint';
-import { Compartment, EditorState, type TransactionSpec } from '@codemirror/state';
+import {
+  Compartment,
+  EditorState,
+  type TransactionSpec
+} from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -66,6 +70,74 @@ describe('editor state', () => {
       severity: 'error',
       source: 'Context error'
     } ]);
+  });
+
+
+  it('should format the complete context on paste', () => {
+
+    // given
+    const editor = createContextEditor({
+      value: '',
+      attributes: new Compartment(),
+      onChange: () => {}
+    });
+
+    // when
+    paste(editor, '{"customer":{"name":"Jane"}}');
+
+    // then
+    expect(editor.state.doc.toString()).to.equal(`{
+  "customer": {
+    "name": "Jane"
+  }
+}`);
+    expect(editor.state.selection.main.anchor).to.equal(editor.state.doc.length);
+    editor.destroy();
+  });
+
+
+  it('should preserve invalid context on paste', () => {
+
+    // given
+    const editor = createContextEditor({
+      value: '',
+      attributes: new Compartment(),
+      onChange: () => {}
+    });
+
+    // when
+    paste(editor, '{"customer":');
+
+    // then
+    expect(editor.state.doc.toString()).to.equal('{"customer":');
+    editor.destroy();
+  });
+
+
+  it('should preserve the cursor position when pasting a value', () => {
+
+    // given
+    const editor = createContextEditor({
+      value: '{ "foo": null, "bar": 2 }',
+      attributes: new Compartment(),
+      onChange: () => {}
+    });
+    const from = editor.state.doc.toString().indexOf('null');
+
+    editor.dispatch({ selection: { anchor: from, head: from + 4 } });
+
+    // when
+    paste(editor, '1');
+
+    // then
+    expect(editor.state.doc.toString()).to.equal(`{
+  "foo": 1,
+  "bar": 2
+}`);
+    expect(editor.state.selection.main.anchor).to.equal(
+      editor.state.doc.toString().indexOf('1') + 1
+    );
+    editor.destroy();
   });
 
 
@@ -177,4 +249,23 @@ describe('editor state', () => {
 
 function selectedText(state: EditorState): string {
   return state.sliceDoc(state.selection.main.from, state.selection.main.to);
+}
+
+function createContextEditor(options: Parameters<typeof createContextEditorState>[0]) {
+  return new EditorView({
+    state: createContextEditorState(options),
+    parent: document.body
+  });
+}
+
+function paste(editor: EditorView, text: string) {
+  const event = new Event('paste', { bubbles: true, cancelable: true });
+
+  Object.defineProperty(event, 'clipboardData', {
+    value: {
+      getData: (type: string) => type === 'text/plain' ? text : ''
+    }
+  });
+
+  editor.contentDOM.dispatchEvent(event);
 }
