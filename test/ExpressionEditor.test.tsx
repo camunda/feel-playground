@@ -80,6 +80,47 @@ describe('<ExpressionEditor>', () => {
     }));
   });
 
+
+  it('should update autocomplete variables from context', () => {
+
+    // given
+    const { rerender } = render(
+      <FeelPlayground
+        expression="customer.name"
+        onExpressionChange={ () => {} }
+        context={ '{ "customer": { "name": "Jane" } }' }
+        onContextChange={ () => {} }
+        dialect="expression"
+        variables={ [ { name: 'processVariable', detail: 'Number' } ] }
+      />
+    );
+
+    // when
+    rerender(
+      <FeelPlayground
+        expression="order.total"
+        onExpressionChange={ () => {} }
+        context={ '{ "order": { "total": 42 } }' }
+        onContextChange={ () => {} }
+        dialect="expression"
+        variables={ [ { name: 'processVariable', detail: 'Number' } ] }
+      />
+    );
+
+    // then
+    expect(editor.setVariables).toHaveBeenLastCalledWith([
+      { name: 'processVariable', detail: 'Number' },
+      {
+        name: 'order',
+        detail: 'Context',
+        info: '{\n  "total": 42\n}',
+        entries: [
+          { name: 'total', detail: 'Number', info: '42' }
+        ]
+      }
+    ]);
+  });
+
 });
 
 function renderEditor({ engines }: { engines?: Record<string, string> } = {}) {

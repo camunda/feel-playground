@@ -55,7 +55,7 @@ Evaluation is remote-only. Authentication, connectivity, and endpoint-specific r
 
 The package is distributed as ESM and requires React 19 and the Camunda Design System. Import the design-system stylesheet once at the application root, followed by the playground stylesheet. In applications that also use Carbon, load Carbon styles first, then design-system styles, then consumer overrides.
 
-The context is a controlled, serialized JSON value. When it is empty, the playground analyzes the expression and prefills the variables it references. The optional `variables` tree provides model-known structure for autocomplete and context generation; references missing from that tree are added with `null` values. The reload action restores this generated context without replacing a context restored by the host on open.
+The context is a controlled, serialized JSON value. When it is empty, the playground analyzes the expression and prefills the variables it references. The optional `variables` tree provides model-known structure for autocomplete and context generation; references missing from that tree are added with `null` values. Valid context values enrich the expression editor's autocomplete with their nested structure and example values. The reload action restores the generated context without replacing a context restored by the host on open.
 
 When evaluation is temporarily unavailable, omit `onEvaluate` and explain why with `evaluationUnavailable`:
 

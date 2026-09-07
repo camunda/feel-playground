@@ -2,6 +2,7 @@ import {
   type KeyboardEvent,
   type PointerEvent,
   useEffect,
+  useMemo,
   useRef,
   useState
 } from 'react';
@@ -15,9 +16,11 @@ import {
   type Evaluate,
   type FeelDialect,
   type FeelLanguageContext,
+  type FeelVariable,
   type PlaygroundController,
   type PlaygroundState
 } from '../core/types';
+import { resolveAutocompleteVariables } from '../core/contextVariables';
 import { createPlaygroundController } from '../core/createPlaygroundController';
 import { nextEvaluationHeight } from '../core/nextEvaluationHeight';
 import { resolveEvaluationContext } from '../core/resolveEvaluationContext';
@@ -26,8 +29,7 @@ import { ContextEditor, type ContextEditorHandle } from './ContextEditor';
 import {
   ExpressionEditor,
   type ExpressionEditorHandle,
-  type FeelLintReport,
-  type FeelVariable
+  type FeelLintReport
 } from './ExpressionEditor';
 import { ResultView } from './ResultView';
 import { StatusIcon } from './StatusIcon';
@@ -83,6 +85,10 @@ export function FeelPlayground({
   const [ expressionValid, setExpressionValid ] = useState<boolean | null>(null);
   const [ expressionErrors, setExpressionErrors ] = useState<FeelLintReport[]>([]);
   const [ evaluationHeight, setEvaluationHeight ] = useState<number | null>(null);
+  const autocompleteVariables = useMemo(
+    () => resolveAutocompleteVariables(context, variables),
+    [ context, variables ]
+  );
 
   const handleExpressionChange = (nextExpression: string) => {
     setExpressionValid(null);
@@ -258,7 +264,7 @@ export function FeelPlayground({
               onValidityChange={ setExpressionValid }
               onErrorsChange={ setExpressionErrors }
               dialect={ dialect }
-              variables={ variables }
+              variables={ autocompleteVariables }
               engines={ feelLanguageContext?.engines }
             />
           </section>

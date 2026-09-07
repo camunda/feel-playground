@@ -8,16 +8,15 @@ import {
 import FeelEditor from '@bpmn-io/feel-editor';
 import { lineNumbers } from '@codemirror/view';
 
-import type { FeelDialect, FeelEngines } from '../core/types';
+import type {
+  FeelDialect,
+  FeelEngines,
+  FeelVariable
+} from '../core/types';
 import type { PlaygroundDiagnostic } from './DiagnosticList';
 import { createErrorLineNumbers } from './errorLineNumbers';
 
-export interface FeelVariable {
-  name: string;
-  detail?: string;
-  info?: string;
-  entries?: FeelVariable[];
-}
+export type { FeelVariable } from '../core/types';
 
 export type FeelLintReport = PlaygroundDiagnostic;
 

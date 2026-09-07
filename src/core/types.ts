@@ -4,6 +4,14 @@ export type FeelDialect = 'expression' | 'unaryTests';
 
 export type FeelEngines = Record<string, string>;
 
+export interface FeelVariable {
+  name: string;
+  detail?: string;
+  info?: string;
+  isList?: boolean | 'optional';
+  entries?: FeelVariable[];
+}
+
 export interface FeelBuiltin {
   name: string;
   type?: 'function';
