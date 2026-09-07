@@ -23,7 +23,7 @@ export function resolveEvaluationContext({
   feelLanguageContext = {}
 }: ResolveEvaluationContextOptions): EvaluationContext {
   if (!expression) {
-    return toContext(variables);
+    return {};
   }
 
   const analyzer = new FeelAnalyzer(feelLanguageContext);

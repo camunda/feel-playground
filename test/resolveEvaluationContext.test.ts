@@ -78,7 +78,7 @@ describe('resolveEvaluationContext', () => {
   });
 
 
-  it('should return all known variables without an expression', () => {
+  it('should return an empty context without an expression', () => {
 
     // when
     const context = resolveEvaluationContext({
@@ -87,10 +87,7 @@ describe('resolveEvaluationContext', () => {
     });
 
     // then
-    expect(context).to.eql({
-      customer: null,
-      order: null
-    });
+    expect(context).to.eql({});
   });
 
 });
