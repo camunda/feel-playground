@@ -4,7 +4,14 @@
 
 A React component for editing and remotely evaluating FEEL expressions with a JSON context.
 
-The package owns the expression editor, context editor, generated context, and result presentation. The host owns expression state, user-edited context, and the evaluation function.
+## Features
+
+- FEEL expression and unary-tests editing
+- Autocomplete and diagnostics
+- JSON context editing and prefill
+- Detection and completion of missing context variables
+- Remote evaluation with result, warning, loading, and error states
+- Host-provided variables and FEEL language configuration
 
 ## Usage
 
@@ -51,26 +58,23 @@ export function Playground() {
 }
 ```
 
-Evaluation is remote-only. Authentication, connectivity, and endpoint-specific request mapping remain host responsibilities. The evaluator must return an object containing `result` and a `warnings` array.
+## API
 
-The package is distributed as ESM and requires React 19 and the Camunda Design System. Import the design-system stylesheet once at the application root, followed by the playground stylesheet. In applications that also use Carbon, load Carbon styles first, then design-system styles, then consumer overrides.
+### `FeelPlayground`
 
-The context is a serialized JSON value. Leave `context` undefined to let the playground generate it from variables referenced by the expression and keep it updated as the expression changes. The first user change is reported through `onContextChange`; pass that value back to transfer context ownership to the host. Passing a context restored from storage disables automatic generation.
+| Prop | Type | Required | Description |
+| --- | --- | --- | --- |
+| `expression` | `string` | Yes | Current FEEL expression or unary tests. |
+| `onExpressionChange` | `(expression: string) => void` | Yes | Called when the expression changes. |
+| `context` | `string` | No | Serialized JSON evaluation context. Omit to prefill it from the initial expression. |
+| `onContextChange` | `(context: string) => void` | Yes | Called when the context changes. |
+| `dialect` | `'expression' \| 'unaryTests'` | Yes | FEEL syntax accepted by the editor. |
+| `feelLanguageContext` | `FeelLanguageContext` | No | Built-ins, parser dialect, and engine compatibility configuration. |
+| `variables` | `FeelVariable[]` | No | Variables available for autocomplete and context generation. |
+| `onEvaluate` | `Evaluate` | No | Evaluates the expression remotely. |
+| `evaluationUnavailable` | `string` | No | Explains why evaluation is unavailable when no evaluator is provided. |
 
-The optional `variables` tree provides model-known structure for autocomplete and context generation; references missing from that tree are added with `null` values. Valid context values enrich the expression editor's autocomplete with their nested structure and example values. The reload action restores the generated context.
-
-When evaluation is temporarily unavailable, omit `onEvaluate` and explain why with `evaluationUnavailable`:
-
-```tsx
-<FeelPlayground
-  expression={expression}
-  onExpressionChange={setExpression}
-  context={context}
-  onContextChange={setContext}
-  dialect="expression"
-  evaluationUnavailable="Connect to a Camunda cluster to evaluate this expression."
-/>
-```
+The package is distributed as ESM and requires React 19 and the Camunda Design System. Evaluation, authentication, and connectivity are provided by the host.
 
 ## Run locally with c8run
 
