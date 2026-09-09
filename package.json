@@ -1,6 +1,6 @@
 {
   "name": "@camunda/feel-playground",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "Playground for editing and evaluating FEEL expressions",
   "license": "MIT",
   "author": "Camunda Services GmbH",
