@@ -121,10 +121,9 @@ export function FeelPlayground({
 
   const insertContext = (
       nextContext: EvaluationContext,
-      options: { focus?: boolean } = {},
-      generated = true
+      options: { focus?: boolean } = {}
   ) => {
-    generatingContextRef.current = generated;
+    generatingContextRef.current = true;
 
     try {
       contextEditorRef.current?.insertTemplate(toSnippetTemplate(nextContext), options);
@@ -143,7 +142,7 @@ export function FeelPlayground({
 
   const handleAddMissingContext = () => {
     if (missingContext) {
-      insertContext(missingContext, { focus: true }, false);
+      insertContext(missingContext, { focus: true });
     }
   };
 

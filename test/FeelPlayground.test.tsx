@@ -90,6 +90,31 @@ describe('<FeelPlayground>', () => {
   });
 
 
+  it('should keep updated generated context local', async () => {
+
+    // given
+    const onContextChange = vi.fn();
+
+    render(<Playground onContextChange={ onContextChange } />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Evaluation context').textContent).toContain('"foo": null');
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Change expression' }));
+
+    // when
+    fireEvent.click(screen.getByRole('button', { name: 'Update' }));
+
+    // then
+    await waitFor(() => {
+      expect(screen.getByLabelText('Evaluation context').textContent).toContain('"bar": null');
+    });
+
+    expect(onContextChange).not.toHaveBeenCalled();
+  });
+
+
   it('should report user changes to generated context', async () => {
 
     // given
