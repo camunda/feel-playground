@@ -1,10 +1,7 @@
 import { useEffect, useImperativeHandle, useRef, type Ref } from 'react';
 
 import {
-  Button,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger
+  Button
 } from '@camunda/design-system';
 import { setDiagnostics } from '@codemirror/lint';
 import { Compartment } from '@codemirror/state';
@@ -31,12 +28,20 @@ export interface ContextEditorHandle {
 interface ContextEditorProps {
   value: string;
   onChange(value: string): void;
-  onReset?(): void;
+  incomplete?: boolean;
+  onAddMissingContext?(): void;
   error?: string;
   ref?: Ref<ContextEditorHandle>;
 }
 
-export function ContextEditor({ value, onChange, onReset, error, ref }: ContextEditorProps) {
+export function ContextEditor({
+  value,
+  onChange,
+  incomplete,
+  onAddMissingContext,
+  error,
+  ref
+}: ContextEditorProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
   const valueRef = useRef(value);
@@ -145,33 +150,21 @@ export function ContextEditor({ value, onChange, onReset, error, ref }: ContextE
       <div className="feel-playground__section-heading">
         <h3>Context</h3>
         <div className="feel-playground__section-heading-actions">
-          {onReset && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  aria-label="Reset to prefilled context"
-                  size="icon-xs"
-                  variant="ghost"
-                  onClick={ onReset }
-                >
-                  <svg
-                    aria-hidden="true"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M3 12a9 9 0 1 0 3-7.7L3 7" />
-                    <path d="M3 3v4h4" />
-                  </svg>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="feel-playground__context-reset-tooltip">
-                Reset to prefilled context
-              </TooltipContent>
-            </Tooltip>
+          {incomplete && onAddMissingContext && !error && (
+            <>
+              <span className="feel-playground__context-incomplete" role="status">
+                <StatusIcon status="warning" />
+                Missing context variables
+              </span>
+              <Button
+                className="feel-playground__context-add-button"
+                size="xs"
+                variant="secondary"
+                onClick={ onAddMissingContext }
+              >
+                Update
+              </Button>
+            </>
           )}
           {error && (
             <span className="feel-playground__error-count">

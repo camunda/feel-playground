@@ -14,15 +14,18 @@ import {
 
 import {
   type Evaluate,
+  type EvaluationContext,
   type FeelDialect,
   type FeelLanguageContext,
   type FeelVariable,
   type PlaygroundController,
   type PlaygroundState
 } from '../core/types';
+import { addMissingContext } from '../core/contextCompleteness';
 import { resolveAutocompleteVariables } from '../core/contextVariables';
 import { createPlaygroundController } from '../core/createPlaygroundController';
 import { nextEvaluationHeight } from '../core/nextEvaluationHeight';
+import { parseContext } from '../core/parseContext';
 import { resolveEvaluationContext } from '../core/resolveEvaluationContext';
 import { toSnippetTemplate } from '../core/snippetTemplate';
 import { ContextEditor, type ContextEditorHandle } from './ContextEditor';
@@ -41,16 +44,15 @@ const SPLITTER_HEIGHT = 5;
 const EMPTY_VARIABLES: FeelVariable[] = [];
 
 /**
- * Controlled FEEL playground. The host owns expression and context persistence
- * and injects the evaluator implementation.
+ * FEEL playground. The host owns expression state, context persistence, and
+ * injects the evaluator implementation.
  *
- * An empty context is prefilled from the variables referenced by the expression,
- * so the user can tab through the values.
+ * Without a context, the playground generates one from the initial expression.
  */
 export interface FeelPlaygroundProps {
   expression: string;
   onExpressionChange(expression: string): void;
-  context: string;
+  context?: string;
   onContextChange(context: string): void;
   dialect: FeelDialect;
   feelLanguageContext?: FeelLanguageContext;
@@ -71,6 +73,7 @@ export function FeelPlayground({
   evaluationUnavailable
 }: FeelPlaygroundProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const generatingContextRef = useRef(false);
   const contextEditorRef = useRef<ContextEditorHandle | null>(null);
   const controllerRef = useRef<PlaygroundController | null>(null);
   const evaluationRef = useRef<HTMLDivElement | null>(null);
@@ -81,13 +84,33 @@ export function FeelPlayground({
     startY: number;
   } | null>(null);
   const openEvaluationHeightRef = useRef<number | null>(null);
+  const [ generatedContext, setGeneratedContext ] = useState('{}');
   const [ state, setState ] = useState<PlaygroundState>({ status: 'idle' });
   const [ expressionValid, setExpressionValid ] = useState<boolean | null>(null);
   const [ expressionErrors, setExpressionErrors ] = useState<FeelLintReport[]>([]);
   const [ evaluationHeight, setEvaluationHeight ] = useState<number | null>(null);
+  const resolvedContext = context ?? generatedContext;
+  const requiredContext = useMemo(
+    () => resolveEvaluationContext({
+      expression,
+      variables,
+      feelLanguageContext: {
+        ...feelLanguageContext,
+        dialect
+      }
+    }),
+    [ dialect, expression, feelLanguageContext, variables ]
+  );
+  const missingContext = useMemo(() => {
+    try {
+      return addMissingContext(parseContext(resolvedContext), requiredContext);
+    } catch {
+      return null;
+    }
+  }, [ requiredContext, resolvedContext ]);
   const autocompleteVariables = useMemo(
-    () => resolveAutocompleteVariables(context, variables),
-    [ context, variables ]
+    () => resolveAutocompleteVariables(resolvedContext, variables),
+    [ resolvedContext, variables ]
   );
 
   const handleExpressionChange = (nextExpression: string) => {
@@ -96,28 +119,41 @@ export function FeelPlayground({
     onExpressionChange(nextExpression);
   };
 
-  const fillContext = (options: { focus?: boolean } = {}) => {
-    const resolvedContext = resolveEvaluationContext({
-      expression,
-      variables,
-      feelLanguageContext: {
-        ...feelLanguageContext,
-        dialect
-      }
-    });
+  const insertContext = (
+      nextContext: EvaluationContext,
+      options: { focus?: boolean } = {},
+      generated = true
+  ) => {
+    generatingContextRef.current = generated;
 
-    contextEditorRef.current?.insertTemplate(toSnippetTemplate(resolvedContext), options);
+    try {
+      contextEditorRef.current?.insertTemplate(toSnippetTemplate(nextContext), options);
+    } finally {
+      generatingContextRef.current = false;
+    }
   };
 
-  const handleContextReset = () => fillContext({ focus: true });
+  const handleContextChange = (nextContext: string) => {
+    if (context === undefined && generatingContextRef.current) {
+      setGeneratedContext(nextContext);
+    } else {
+      onContextChange(nextContext);
+    }
+  };
+
+  const handleAddMissingContext = () => {
+    if (missingContext) {
+      insertContext(missingContext, { focus: true }, false);
+    }
+  };
 
   // prefill on open, leaving a context the host restored untouched
   useEffect(() => {
-    if (!isEmptyContext(context)) {
+    if (context !== undefined && !isEmptyContext(context)) {
       return;
     }
 
-    fillContext();
+    insertContext(requiredContext);
   }, []);
 
   useEffect(() => {
@@ -136,12 +172,12 @@ export function FeelPlayground({
     controllerRef.current?.update({
       expression,
       expressionValid,
-      context,
+      context: resolvedContext,
       dialect,
       onEvaluate,
       evaluationUnavailable
     });
-  }, [ expression, expressionValid, context, dialect, onEvaluate, evaluationUnavailable ]);
+  }, [ expression, expressionValid, resolvedContext, dialect, onEvaluate, evaluationUnavailable ]);
 
   const resizeEvaluation = (startHeight: number, moved = true) => {
     const container = containerRef.current;
@@ -285,9 +321,10 @@ export function FeelPlayground({
           <div className="feel-playground__evaluation" ref={ evaluationRef }>
             <ContextEditor
               ref={ contextEditorRef }
-              value={ context }
-              onChange={ onContextChange }
-              onReset={ handleContextReset }
+              value={ resolvedContext }
+              onChange={ handleContextChange }
+              incomplete={ !!missingContext }
+              onAddMissingContext={ handleAddMissingContext }
               error={ state.status === 'invalid-context' ? state.error : undefined }
             />
             <ResultView

@@ -89,6 +89,22 @@
   gap: 8px;
 }
 
+.feel-playground__context-incomplete {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--warning-action-default);
+  font-size: 12px;
+}
+
+.feel-playground__section-heading-actions .feel-playground__context-add-button {
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1;
+}
+
 .feel-playground__section-heading h3 {
   font-size: 14px;
   font-weight: 500;

@@ -148,10 +148,13 @@ export function App() {
   );
 }
 
-function getPreviewValues(preview: Preview) {
+function getPreviewValues(preview: Preview): {
+  expression: string;
+  context?: string;
+} {
   switch (preview) {
   case 'live':
-    return { expression: INITIAL_EXPRESSION, context: '' };
+    return { expression: INITIAL_EXPRESSION };
   case 'empty':
     return { expression: '', context: INITIAL_CONTEXT };
   case 'expression-error':
