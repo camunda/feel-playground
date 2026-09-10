@@ -55,8 +55,7 @@ describe('<FeelPlayground>', () => {
 
     // then
     expect(screen.getByLabelText('Evaluation context').textContent).not.toContain('"bar": null');
-    expect(screen.getByText('Missing context variables')).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Update' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Update context variables' })).toBeTruthy();
     expect(onContextChange).not.toHaveBeenCalled();
   });
 
@@ -75,7 +74,7 @@ describe('<FeelPlayground>', () => {
     );
 
     // when
-    fireEvent.click(screen.getByRole('button', { name: 'Update' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Update context variables' }));
 
     // then
     await waitFor(() => {
@@ -85,7 +84,6 @@ describe('<FeelPlayground>', () => {
       expect(context).toContain('"bar": null');
     });
 
-    expect(screen.queryByText('Missing context variables')).toBeNull();
     expect(onContextChange).toHaveBeenCalledOnce();
   });
 
@@ -104,7 +102,7 @@ describe('<FeelPlayground>', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Change expression' }));
 
     // when
-    fireEvent.click(screen.getByRole('button', { name: 'Update' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Update context variables' }));
 
     // then
     await waitFor(() => {

@@ -152,17 +152,13 @@ export function ContextEditor({
         <div className="feel-playground__section-heading-actions">
           {incomplete && onAddMissingContext && !error && (
             <>
-              <span className="feel-playground__context-incomplete" role="status">
-                <StatusIcon status="warning" />
-                Missing context variables
-              </span>
               <Button
                 className="feel-playground__context-add-button"
                 size="xs"
                 variant="secondary"
                 onClick={ onAddMissingContext }
               >
-                Update
+                Update context variables
               </Button>
             </>
           )}
