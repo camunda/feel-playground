@@ -1,4 +1,4 @@
-import { useEffect, useImperativeHandle, useRef, type Ref } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
 import {
   Button
@@ -31,17 +31,15 @@ interface ContextEditorProps {
   incomplete?: boolean;
   onAddMissingContext?(): void;
   error?: string;
-  ref?: Ref<ContextEditorHandle>;
 }
 
-export function ContextEditor({
+export const ContextEditor = forwardRef<ContextEditorHandle, ContextEditorProps>(function ContextEditor({
   value,
   onChange,
   incomplete,
   onAddMissingContext,
-  error,
-  ref
-}: ContextEditorProps) {
+  error
+}, ref) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
   const valueRef = useRef(value);
@@ -188,4 +186,4 @@ export function ContextEditor({
       </p>
     </section>
   );
-}
+});
