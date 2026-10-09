@@ -165,7 +165,6 @@ export function ContextEditor({
           {error && (
             <span className="feel-playground__error-count">
               <StatusIcon status="error" />
-              1
             </span>
           )}
         </div>
