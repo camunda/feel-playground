@@ -365,7 +365,7 @@
 }
 
 .feel-playground__status-icon.error {
-  color: var(--danger-action-default);
+  color: var(--danger-foreground-subtle);
 }
 
 .feel-playground__errors {
