@@ -47,7 +47,7 @@ export function ResultView({
       />
 
       <p className="feel-playground__pane-hint">
-        Evaluates on the connected Camunda instance when the expression changes.
+        Evaluates when the expression changes.
       </p>
     </section>
   );
