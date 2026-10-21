@@ -39,11 +39,14 @@ test('should expose the playground stylesheet', async () => {
 test('should include public artifacts in the package', () => {
 
   // when
-  const [{ files }] = JSON.parse(execFileSync(
+  const result = JSON.parse(execFileSync(
     'npm',
     [ 'pack', '--dry-run', '--ignore-scripts', '--json' ],
     { encoding: 'utf8' }
   ));
+
+  // npm 12 keys the result by package name, earlier versions return an array
+  const [{ files }] = Array.isArray(result) ? result : Object.values(result);
   const paths = files.map(file => file.path);
   const missing = [
     'dist/index.js',
