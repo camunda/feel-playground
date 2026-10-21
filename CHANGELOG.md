@@ -6,6 +6,8 @@ All notable changes are documented here. We use [semantic versioning](http://sem
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.0.3
+
 * `FIX`: allow `@camunda/design-system` versions newer than 0.51
 
 ## 1.0.2
