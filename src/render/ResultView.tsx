@@ -2,7 +2,7 @@ import type {
   EvaluationWarning,
   PlaygroundState
 } from '../core/types';
-import { Skeleton } from '@camunda/design-system';
+import { Button, Heading, Skeleton } from '@camunda/design-system';
 import {
   DiagnosticList,
   type PlaygroundDiagnostic
@@ -73,7 +73,30 @@ function Result({ state, expressionErrors = [] }: ResultViewProps) {
   case 'loading':
     return <LoadingResult state={ state } />;
   case 'unavailable':
-    return <ResultMessage>{state.message}</ResultMessage>;
+    return (
+      <ResultMessage>
+        {state.title && (
+          <Heading as="h4" variant="heading-xs" className="feel-playground__unavailable-title">
+            {state.title}
+          </Heading>
+        )}
+        {state.message}
+        {state.action && (
+          <>
+            {' '}
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="feel-playground__unavailable-action"
+              onClick={ state.action.onClick }
+            >
+              {state.action.label}
+            </Button>
+          </>
+        )}
+      </ResultMessage>
+    );
   case 'error':
     return <ResultMessage>{state.error}</ResultMessage>;
   case 'success':

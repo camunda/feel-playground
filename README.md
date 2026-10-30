@@ -72,7 +72,12 @@ export function Playground() {
 | `feelLanguageContext` | `FeelLanguageContext` | No | Built-ins, parser dialect, and engine compatibility configuration. |
 | `variables` | `FeelVariable[]` | No | Variables available for autocomplete and context generation. |
 | `onEvaluate` | `Evaluate` | No | Evaluates the expression remotely. |
-| `evaluationUnavailable` | `string` | No | Explains why evaluation is unavailable when no evaluator is provided. |
+| `evaluationUnavailable` | `string \| EvaluationUnavailable` | No | Explains why evaluation is unavailable when no evaluator is provided. Supports a title, message, and optional action. |
+
+When `onEvaluate` is absent, `evaluationUnavailable` accepts plain text or
+`{ title, message, action?: { label, onClick } }`. The optional action renders
+after the message and calls the host's `onClick` handler. Omitting the prop shows
+"Evaluation is unavailable."
 
 The package is distributed as ESM and requires React 19 and Camunda Design System 0.76 or newer. Evaluation, authentication, and connectivity are provided by the host.
 
@@ -89,3 +94,7 @@ npm start
 ```
 
 Open the URL printed by Vite. The example configuration uses c8run Basic authentication with username `demo` and password `demo`.
+
+The **Unavailable** preview showcases the title, message, and action API.
+Click **Use demo connection** to switch to a simulated successful evaluation,
+without a running cluster.

@@ -11,6 +11,7 @@ export type {
   EvaluationContext,
   EvaluationInput,
   EvaluationResult,
+  EvaluationUnavailable,
   EvaluationWarning,
   FeelBuiltin,
   FeelDialect,

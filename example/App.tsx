@@ -2,7 +2,8 @@ import { useState } from 'react';
 
 import {
   FeelPlayground,
-  type Evaluate
+  type Evaluate,
+  type EvaluationUnavailable
 } from '../src';
 import { evaluateOnConfiguredCluster } from './evaluate';
 
@@ -103,7 +104,7 @@ export function App() {
   const {
     evaluationUnavailable,
     onEvaluate
-  } = getPreviewConfig(preview);
+  } = getPreviewConfig(preview, () => selectPreview('success'));
 
   return (
     <main className="app-shell">
@@ -168,13 +169,22 @@ function getPreviewValues(preview: Preview): {
   }
 }
 
-function getPreviewConfig(preview: Preview): {
-  evaluationUnavailable?: string;
+function getPreviewConfig(preview: Preview, onUseDemoConnection: () => void): {
+  evaluationUnavailable?: EvaluationUnavailable;
   onEvaluate?: Evaluate;
 } {
   switch (preview) {
   case 'unavailable':
-    return { evaluationUnavailable: 'No Camunda connection.' };
+    return {
+      evaluationUnavailable: {
+        title: 'No connection selected',
+        message: 'Use a simulated connection to try expression evaluation without a running cluster.',
+        action: {
+          label: 'Use demo connection',
+          onClick: onUseDemoConnection
+        }
+      }
+    };
   case 'loading':
     return { onEvaluate: LOADING_EVALUATOR };
   case 'success':

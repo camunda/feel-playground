@@ -15,6 +15,7 @@ import {
 import {
   type Evaluate,
   type EvaluationContext,
+  type EvaluationUnavailable,
   type FeelDialect,
   type FeelLanguageContext,
   type FeelVariable,
@@ -58,7 +59,7 @@ export interface FeelPlaygroundProps {
   feelLanguageContext?: FeelLanguageContext;
   variables?: FeelVariable[];
   onEvaluate?: Evaluate;
-  evaluationUnavailable?: string;
+  evaluationUnavailable?: string | EvaluationUnavailable;
 }
 
 export function FeelPlayground({

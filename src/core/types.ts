@@ -52,13 +52,26 @@ export type Evaluate = (
   options: { signal: AbortSignal }
 ) => Promise<EvaluationResult>;
 
+/**
+ * Host-provided explanation shown when no evaluator is available.
+ * The action is optional and renders after the message.
+ */
+export interface EvaluationUnavailable {
+  title: string;
+  message: string;
+  action?: {
+    label: string;
+    onClick(): void;
+  };
+}
+
 export interface PlaygroundInput {
   expression: string;
   expressionValid?: boolean | null;
   context: string;
   dialect: FeelDialect;
   onEvaluate?: Evaluate;
-  evaluationUnavailable?: string;
+  evaluationUnavailable?: string | EvaluationUnavailable;
 }
 
 export type PlaygroundState =
@@ -66,7 +79,7 @@ export type PlaygroundState =
   | { status: 'validating-expression'; previousResult?: unknown }
   | { status: 'invalid-expression' }
   | { status: 'invalid-context'; error: string }
-  | { status: 'unavailable'; message: string }
+  | { status: 'unavailable'; message: string; title?: string; action?: EvaluationUnavailable['action'] }
   | { status: 'scheduled'; previousResult?: unknown }
   | { status: 'loading'; previousResult?: unknown }
   | { status: 'success'; result: unknown }
