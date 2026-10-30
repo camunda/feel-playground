@@ -6,6 +6,10 @@ All notable changes are documented here. We use [semantic versioning](http://sem
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.1.1
+
+* `DEPS`: update to `@bpmn-io/feel-editor@2.8.1`
+
 ## 1.1.0
 
 * `FEAT`: support a title, message, and action for unavailable evaluation

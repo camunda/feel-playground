@@ -51,7 +51,7 @@
   "dependencies": {
     "@bpmn-io/cm-theme": "^0.2.2",
     "@bpmn-io/feel-analyzer": "^0.5.1",
-    "@bpmn-io/feel-editor": "^2.7.1",
+    "@bpmn-io/feel-editor": "^2.8.1",
     "@codemirror/autocomplete": "^6.20.3",
     "@codemirror/lang-json": "^6.0.2",
     "@codemirror/lint": "^6.9.7",
