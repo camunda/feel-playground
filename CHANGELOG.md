@@ -6,6 +6,8 @@ All notable changes are documented here. We use [semantic versioning](http://sem
 
 ___Note:__ Yet to be released changes appear here._
 
+## 1.1.0
+
 * `FEAT`: support a title, message, and action for unavailable evaluation
 * `DEPS`: require `@camunda/design-system@0.76.0` or newer
 * `FIX`: use design-system status icons and loading indicators
