@@ -74,7 +74,7 @@ export function Playground() {
 | `onEvaluate` | `Evaluate` | No | Evaluates the expression remotely. |
 | `evaluationUnavailable` | `string` | No | Explains why evaluation is unavailable when no evaluator is provided. |
 
-The package is distributed as ESM and requires React 19 and the Camunda Design System. Evaluation, authentication, and connectivity are provided by the host.
+The package is distributed as ESM and requires React 19 and Camunda Design System 0.76 or newer. Evaluation, authentication, and connectivity are provided by the host.
 
 ## Run locally with c8run
 

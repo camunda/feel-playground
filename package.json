@@ -44,7 +44,7 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@camunda/design-system": ">=0.51.0",
+    "@camunda/design-system": ">=0.76.0",
     "react": ">=19.0.0 <20",
     "react-dom": ">=19.0.0 <20"
   },
@@ -60,7 +60,7 @@
     "codemirror": "^6.0.2"
   },
   "devDependencies": {
-    "@camunda/design-system": "^0.51.0",
+    "@camunda/design-system": "^0.76.0",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.6",
     "@types/node": "^24.3.0",

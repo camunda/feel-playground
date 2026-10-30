@@ -53,7 +53,7 @@ describe('<ResultView>', () => {
 
     // then
     expect(screen.getByRole('status', { name: 'Loading result' })).to.exist;
-    expect(screen.getByRole('img', { name: 'Loading' })).to.exist;
+    expect(screen.getByRole('status', { name: 'Loading' })).to.exist;
   });
 
 
@@ -98,7 +98,7 @@ describe('<ResultView>', () => {
     // then
     expect(screen.getByRole('status', { name: 'Loading result' })).to.exist;
     expect(document.querySelectorAll('[data-slot="skeleton"]')).to.have.length(3);
-    expect(screen.getByRole('img', { name: 'Loading' })).to.exist;
+    expect(screen.getByRole('status', { name: 'Loading' })).to.exist;
   });
 
 
@@ -109,7 +109,7 @@ describe('<ResultView>', () => {
 
     // then
     expect(screen.getByRole('status', { name: 'Loading result' })).to.exist;
-    expect(screen.getByRole('img', { name: 'Loading' })).to.exist;
+    expect(screen.getByRole('status', { name: 'Loading' })).to.exist;
   });
 
 

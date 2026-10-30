@@ -25,38 +25,6 @@
   align-self: center;
 }
 
-.feel-playground__status-icon.loading {
-  animation: feel-playground-loading-rotate 690ms linear infinite;
-  fill: transparent;
-}
-
-.feel-playground__status-icon.loading circle {
-  stroke-dasharray: 276.4608 276.4608;
-  stroke-width: 16;
-}
-
-.feel-playground__loading-background {
-  stroke: var(--border);
-  stroke-dashoffset: -22;
-}
-
-.feel-playground__loading-stroke {
-  stroke: var(--info-action-default);
-  stroke-dashoffset: 143.759616;
-}
-
-@keyframes feel-playground-loading-rotate {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .feel-playground__status-icon.loading {
-    animation: none;
-  }
-}
-
 .feel-playground__section-heading {
   display: flex;
   height: 40px;
@@ -354,18 +322,6 @@
 
 .feel-playground__result-editor .cm-focused {
   outline: none;
-}
-
-.feel-playground__status-icon.success {
-  color: var(--success-action-default);
-}
-
-.feel-playground__status-icon.warning {
-  color: var(--warning-action-default);
-}
-
-.feel-playground__status-icon.error {
-  color: var(--danger-foreground-subtle);
 }
 
 .feel-playground__errors {

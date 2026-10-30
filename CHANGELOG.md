@@ -6,6 +6,9 @@ All notable changes are documented here. We use [semantic versioning](http://sem
 
 ___Note:__ Yet to be released changes appear here._
 
+* `FIX`: use design-system status icons and loading indicators
+* `DEPS`: require `@camunda/design-system@0.76.0` or newer
+
 * `FIX`: use readable foreground colors for error line numbers and error counts
 
 ## 1.0.3

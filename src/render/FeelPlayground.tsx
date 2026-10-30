@@ -288,7 +288,6 @@ export function FeelPlayground({
               {expressionErrors.length > 0 && (
                 <span className="feel-playground__error-count">
                   <StatusIcon status="error" />
-                  {expressionErrors.length}
                 </span>
               )}
             </div>
