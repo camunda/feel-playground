@@ -1,5 +1,6 @@
 import {
   cleanup,
+  fireEvent,
   render,
   screen,
   within
@@ -8,7 +9,8 @@ import {
   afterEach,
   describe,
   expect,
-  it
+  it,
+  vi
 } from 'vitest';
 
 import type { PlaygroundState } from '../src/core/types';
@@ -137,6 +139,67 @@ describe('<ResultView>', () => {
     expect(screen.getByText('Connect to a cluster.').className)
       .to.contain('feel-playground__result-empty');
     expect(screen.getByRole('img', { name: 'Error' })).to.exist;
+  });
+
+  it('should render an unavailable title, message, and host action', () => {
+
+    // given
+    const onClick = vi.fn();
+
+    // when
+    renderResult({
+      status: 'unavailable',
+      title: 'No connection selected',
+      message: 'Select a connection to evaluate.',
+      action: { label: 'Select connection', onClick }
+    });
+
+    // then
+    expect(screen.getByRole('heading', { name: 'No connection selected', level: 4 })).to.exist;
+    const button = screen.getByRole('button', { name: 'Select connection' });
+    expect(button.parentElement?.textContent)
+      .to.equal('No connection selectedSelect a connection to evaluate. Select connection');
+    expect(button.getAttribute('type')).to.equal('button');
+
+    // when
+    fireEvent.click(button);
+
+    // then
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
+
+  it('should render structured unavailability without an action', () => {
+
+    // when
+    renderResult({
+      status: 'unavailable',
+      title: 'Checking connection',
+      message: 'Waiting for the connection check.'
+    });
+
+    // then
+    expect(screen.getByRole('heading', { name: 'Checking connection' })).to.exist;
+    expect(screen.getByText('Waiting for the connection check.')).to.exist;
+    expect(screen.queryByRole('button')).not.to.exist;
+  });
+
+
+  it('should render unavailable content as text, not HTML', () => {
+
+    // when
+    renderResult({
+      status: 'unavailable',
+      title: '<em>No connection</em>',
+      message: '<img src="invalid">',
+      action: { label: '<b>Connect</b>', onClick: vi.fn() }
+    });
+
+    // then
+    expect(screen.getByRole('heading', { name: '<em>No connection</em>' })).to.exist;
+    expect(screen.getByText('<img src="invalid">')).to.exist;
+    expect(screen.getByRole('button', { name: '<b>Connect</b>' })).to.exist;
+    expect(document.querySelector('em, img, b')).not.to.exist;
   });
 
 

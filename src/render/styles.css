@@ -258,7 +258,7 @@
 .feel-playground__result-body {
   min-height: 0;
   overflow: auto;
-  padding: 6px;
+  padding: 10px 8px;
   color: var(--neutral-foreground-subtle);
   font-family: var(--font-mono);
   font-size: 14px;
@@ -295,6 +295,15 @@
   font-family: var(--font-sans);
   font-size: 14px;
   line-height: 20px;
+}
+
+.feel-playground__unavailable-title {
+  margin: 0 0 4px;
+  color: var(--neutral-foreground-strong);
+}
+
+.feel-playground .feel-playground__unavailable-action {
+  margin: 10px 0;
 }
 
 .feel-playground__pane-hint {

@@ -81,9 +81,13 @@ export function createPlaygroundController(
     }
 
     if (!input.onEvaluate) {
+      const unavailable = input.evaluationUnavailable;
+
       setState({
         status: 'unavailable',
-        message: input.evaluationUnavailable || 'Evaluation is unavailable.'
+        ...(typeof unavailable === 'string'
+          ? { message: unavailable || 'Evaluation is unavailable.' }
+          : unavailable || { message: 'Evaluation is unavailable.' })
       });
       return;
     }

@@ -16,6 +16,7 @@ import {
 } from 'vitest';
 
 import { FeelPlayground } from '../src/render/FeelPlayground';
+import type { EvaluationUnavailable } from '../src';
 
 Range.prototype.getClientRects = vi.fn(() => [] as unknown as DOMRectList);
 Range.prototype.getBoundingClientRect = vi.fn(() => new DOMRect());
@@ -23,6 +24,85 @@ Range.prototype.getBoundingClientRect = vi.fn(() => new DOMRect());
 afterEach(cleanup);
 
 describe('<FeelPlayground>', () => {
+
+  it('should update structured unavailable content and enable evaluation when connected', async () => {
+
+    // given
+    const onClick = vi.fn();
+    const unavailable: EvaluationUnavailable = {
+      title: 'No connection selected',
+      message: 'Select a connection to evaluate.',
+      action: { label: 'Select connection', onClick }
+    };
+    const props = {
+      expression: '1 + 1',
+      onExpressionChange: vi.fn(),
+      context: '{}',
+      onContextChange: vi.fn(),
+      dialect: 'expression' as const
+    };
+    const { rerender } = render(<FeelPlayground { ...props } evaluationUnavailable={ unavailable } />);
+
+    // then
+    await screen.findByRole('heading', { name: 'No connection selected' });
+
+    // when
+    fireEvent.click(screen.getByRole('button', { name: 'Select connection' }));
+
+    // then
+    expect(onClick).toHaveBeenCalledOnce();
+
+    // when
+    const nextAction = vi.fn();
+    rerender(<FeelPlayground { ...props } evaluationUnavailable={ {
+      ...unavailable,
+      title: 'Credentials rejected',
+      message: 'Check the connection credentials.',
+      action: { label: 'Manage connection', onClick: nextAction }
+    } } />);
+
+    // then
+    await screen.findByRole('heading', { name: 'Credentials rejected' });
+    expect(screen.queryByRole('button', { name: 'Select connection' })).not.to.exist;
+
+    // when
+    fireEvent.click(screen.getByRole('button', { name: 'Manage connection' }));
+
+    // then
+    expect(nextAction).toHaveBeenCalledOnce();
+
+    // when
+    const onEvaluate = vi.fn().mockResolvedValue({ result: 2, warnings: [] });
+    rerender(<FeelPlayground { ...props } onEvaluate={ onEvaluate } evaluationUnavailable={ unavailable } />);
+
+    // then
+    await waitFor(() => expect(onEvaluate).toHaveBeenCalledOnce());
+    expect(screen.queryByRole('heading', { name: 'Credentials rejected' })).not.to.exist;
+    expect(screen.queryByRole('heading', { name: 'No connection selected' })).not.to.exist;
+    expect(screen.queryByRole('button', { name: 'Manage connection' })).not.to.exist;
+  });
+
+
+  it('should not show an unavailable action without an expression', async () => {
+
+    // when
+    render(<FeelPlayground
+      expression=""
+      onExpressionChange={ vi.fn() }
+      context="{}"
+      onContextChange={ vi.fn() }
+      dialect="expression"
+      evaluationUnavailable={ {
+        title: 'No connection selected',
+        message: 'Select a connection to evaluate.',
+        action: { label: 'Select connection', onClick: vi.fn() }
+      } }
+    />);
+
+    // then
+    await screen.findByText('Write an expression to see the result');
+    expect(screen.queryByRole('button', { name: 'Select connection' })).not.to.exist;
+  });
 
   it('should prefill context from initial expression', async () => {
 

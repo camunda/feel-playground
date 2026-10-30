@@ -159,6 +159,36 @@ describe('createPlaygroundController', () => {
     });
   });
 
+  it('should preserve structured unavailable details and updated actions', () => {
+
+    // given
+    const controller = createPlaygroundController();
+    const unavailable = {
+      title: 'No connection selected',
+      message: 'Select a connection to evaluate.',
+      action: { label: 'Select connection', onClick: vi.fn() }
+    };
+    controller.update({ ...VALID_INPUT, evaluationUnavailable: unavailable });
+
+    // then
+    expect(controller.getState()).to.eql({ status: 'unavailable', ...unavailable });
+    expect(unavailable.action.onClick).not.toHaveBeenCalled();
+
+    // when
+    const nextAction = { label: 'Manage connection', onClick: vi.fn() };
+    controller.update({
+      ...VALID_INPUT,
+      evaluationUnavailable: { ...unavailable, action: nextAction }
+    });
+
+    // then
+    expect(controller.getState()).to.eql({
+      status: 'unavailable',
+      ...unavailable,
+      action: nextAction
+    });
+  });
+
 
   it('should schedule a valid evaluation', () => {
 
