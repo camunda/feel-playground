@@ -77,7 +77,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--danger-action-default);
+  color: var(--danger-foreground-subtle);
   font-size: 14px;
   font-family: var(--font-mono);
 }
@@ -123,7 +123,7 @@
 }
 
 .feel-playground__expression-editor .cm-gutterElement.feel-playground__error-line-number {
-  color: var(--danger-action-default);
+  color: var(--danger-foreground-subtle);
   font-weight: 500;
 }
 
